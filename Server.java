@@ -22,8 +22,6 @@ public class Server {
             connections = new ArrayList<Thread>();
             database = new Database();
 
-            database.createDatabase(); //will create database if it does not exist
-
             Thread acceptConnections = new Thread(new Runnable() {
                 public void run() {
                     while (true) {
