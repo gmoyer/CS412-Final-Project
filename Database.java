@@ -2,11 +2,9 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.TreeMap;
 
 //server side
+//communicates with Entry and AccountManager
 public class Database {
     Connection conn;
     
@@ -27,7 +25,8 @@ public class Database {
         }
     }
 
-    public ResultSet executeQuery(String cmd) {
+    //database communication
+    private ResultSet executeQuery(String cmd) {
         try {
             return conn.createStatement().executeQuery(cmd);
         } catch (SQLException e) {
@@ -35,14 +34,16 @@ public class Database {
             return null;
         }
     }
-    public void executeUpdate(String cmd) {
+    private void executeUpdate(String cmd) {
         try {
             conn.createStatement().executeUpdate(cmd);
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-
+    public void createEntry(String username) {
+        executeUpdate(String.format("INSERT INTO users (username) VALUES ('%s');", username));
+    }
     public int getID(String username) {
         String cmd = "SELECT id FROM users WHERE username='"+username+"'";
         ResultSet rs = executeQuery(cmd);
@@ -63,7 +64,35 @@ public class Database {
             return -1;
         }
     }
+    public boolean fetchEntry(Entry e) {
+        String username = (String)e.getField(Field.USERNAME);
+        int id = getID(username);
+        String cmd = "SELECT * FROM users WHERE id="+id;
+        try {
+            ResultSet rs = executeQuery(cmd);
+            if (rs.getFetchSize() != 1) {
+                return false; //unsuccessful fetch
+            }
 
+            for (Field f : Field.values()) {
+                e.setField(f, rs.getObject(f.getName(), f.getType()));
+            }
+            return true; //successful fetch
+        } catch (SQLException err) {
+            err.printStackTrace();
+            return false; //unsuccessful fetch
+        }
+    }
+
+    public void updateValue(Entry e, Field f) {
+        String cmd = String.format("UPDATE users SET %s = %s WHERE id = %d;", e.getField(Field.NAME).toString(), f.SQL(e.getField(f).toString()), e.getField(Field.ID));
+        executeUpdate(cmd);
+    }
+
+    public void deleteEntry(Entry e) {
+        String cmd = String.format("DELETE FROM users WHERE id = %d;", (int)e.getField(Field.ID));
+        executeUpdate(cmd);
+    }
 
     /*
     public void newEntry(String name, String username, String password) {
