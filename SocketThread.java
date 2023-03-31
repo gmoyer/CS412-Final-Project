@@ -7,10 +7,12 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 //server side!!
+//maintains connection with client and account
 public class SocketThread implements Runnable {
     Socket conn; //server side socket
     BufferedReader bufferedReader;
     PrintWriter printWriter;
+    AccountManager accountManager;
 
     ObjectOutputStream objectWriter;
     ObjectInputStream objectReader;
