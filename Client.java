@@ -13,6 +13,7 @@ public class Client {
 
     ObjectOutputStream objectWriter;
     ObjectInputStream objectReader;
+    Controller controller;
 
     public static void main(String args[]) {
         (new Client()).go();
@@ -31,9 +32,22 @@ public class Client {
 
             sendInstruct(Instruct.SUCCESSFUL_CONNECTION);
 
+            controller = new Controller();
+
             Instruct line;
-            while ((line = receiveInstruct()) != null) {
-                System.out.println(line);
+            boolean cont = true;
+            while ((line = receiveInstruct()) != null && cont) { //communication logic
+                switch(line) {
+                    case SUCCESSFUL_CONNECTION:
+                        System.out.println("Successful connection with server!");
+                        break;
+                    case QUIT:
+                        cont = false;
+                        break;
+                    default:
+                        System.out.println("Something unexpected happened");
+                        break;
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();

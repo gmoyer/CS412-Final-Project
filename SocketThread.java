@@ -31,9 +31,11 @@ public class SocketThread implements Runnable {
             objectWriter = new ObjectOutputStream(conn.getOutputStream());
             objectReader = new ObjectInputStream(conn.getInputStream());
 
+            sendInstruct(Instruct.SUCCESSFUL_CONNECTION);
+
             Instruct line;
             boolean cont = true;
-            while ((line = receiveInstruct()) != null && cont) {
+            while ((line = receiveInstruct()) != null && cont) { //communication logic
                 switch(line) {
                     case SUCCESSFUL_CONNECTION:
                         System.out.println("Successful connection with client!");
