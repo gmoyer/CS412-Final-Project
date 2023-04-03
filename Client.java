@@ -32,7 +32,7 @@ public class Client {
 
             sendInstruct(Instruct.SUCCESSFUL_CONNECTION);
 
-            controller = new Controller();
+            controller = new Controller(this);
 
             Instruct line;
             boolean cont = true;
@@ -54,12 +54,12 @@ public class Client {
         }
     }
 
-    public void sendInstruct(Instruct in) {
+    private void sendInstruct(Instruct in) {
         printWriter.println(in);
         printWriter.flush();
     }
 
-    public Instruct receiveInstruct() {
+    private Instruct receiveInstruct() {
         try {
             String retval = bufferedReader.readLine();
             return Instruct.valueOf(retval);
@@ -67,5 +67,10 @@ public class Client {
             e.printStackTrace();
             return null;
         }
+    }
+
+
+    public boolean signinreq(String username, String password) {
+        return false;
     }
 }

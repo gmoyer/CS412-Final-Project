@@ -3,8 +3,10 @@ import java.awt.event.ActionListener;
 //client side
 public class Controller implements ActionListener {
     View view;
-    public Controller() {
+    Client client;
+    public Controller(Client c) {
         view = new View(this);
+        client = c;
 
         view.navSignin();
     }
@@ -31,5 +33,7 @@ public class Controller implements ActionListener {
         String password = button.getTextField(TextFieldID.PASSWORD);
 
         String hashword = AccountManager.sha256(password);
+
+        client.signinreq(username, hashword);
     }
 }
