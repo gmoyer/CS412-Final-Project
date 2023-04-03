@@ -7,8 +7,9 @@ public class TextField {
     JTextField textField;
     JLabel label;
     JPanel panel;
+    TextFieldID id;
 
-    public TextField(String name, int columns) {
+    public TextField(String name, int columns, TextFieldID tfID) {
         textField = new JTextField(columns);
         label = new JLabel(name);
         panel = new JPanel();
@@ -16,6 +17,8 @@ public class TextField {
         panel.add(textField);
         panel.setAlignmentX(Component.CENTER_ALIGNMENT);
         panel.setMaximumSize(new Dimension(300, 50));
+
+        id = tfID;
     }
 
     public JPanel getPanel() {
@@ -23,5 +26,9 @@ public class TextField {
     }
     public String getText() {
         return textField.getText();
+    }
+
+    public TextFieldID getID() {
+        return id;
     }
 }

@@ -1,15 +1,25 @@
+import java.util.ArrayList;
+
 import javax.swing.JButton;
 
-//so that I can identify the button in Controller
+//so that I can identify the button in Controller and stores text fields associated with box
 public class Button extends JButton {
     private ButtonID bid;
+    private ArrayList<TextField> fields;
 
-    public Button() {super();};
-    public Button(String name) {super(name);};
+    public Button() {
+        super();
+        fields = new ArrayList<TextField>();
+    }
+    public Button(String name) {
+        super(name);
+        fields = new ArrayList<TextField>();
+    }
 
     public Button(String name, ButtonID i) {
         super(name);
         bid = i;
+        fields = new ArrayList<TextField>();
     }
 
     public void setID(ButtonID i) {
@@ -18,5 +28,18 @@ public class Button extends JButton {
 
     public ButtonID getID() {
         return bid;
+    }
+
+    public void addTextField(TextField f) {
+        fields.add(f);
+    }
+
+    public String getTextField(TextFieldID id) {
+        for (TextField tf : fields) {
+            if (tf.getID() == id) {
+                return tf.getText();
+            }
+        }
+        return "FIELD NOT FOUND";
     }
 }
