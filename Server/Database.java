@@ -7,8 +7,9 @@ import java.sql.SQLException;
 //communicates with Entry and AccountManager
 public class Database {
     Connection conn;
+    static Database db = null;
     
-    public Database() {
+    private Database() {
         //create the SQL library if not created
         try {
             conn = DriverManager.getConnection("jdbc:sqlite:serverdata.db");
@@ -23,6 +24,12 @@ public class Database {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public static Database getInstance() {
+        if (db == null)
+            db = new Database();
+        return db;
     }
 
     //database communication

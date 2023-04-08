@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 public class Server {
-    public final static int startingMoney = 50;
 
     ServerSocket serverSocket;
     ArrayList<Thread> connections;
@@ -20,7 +19,7 @@ public class Server {
 
             serverSocket = new ServerSocket(5000);
             connections = new ArrayList<Thread>();
-            database = new Database();
+            database = Database.getInstance();
 
             Thread acceptConnections = new Thread(new Runnable() {
                 public void run() {
@@ -51,7 +50,7 @@ public class Server {
         System.out.println("SERVER: Recieved client");
         
         //thread the connnection
-        Thread thread = new Thread(new SocketThread(conn));
+        Thread thread = new Thread(new SocketThread(conn, this));
         connections.add(thread);
 
         thread.start();

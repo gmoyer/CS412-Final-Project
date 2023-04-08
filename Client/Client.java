@@ -1,22 +1,25 @@
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
 import java.net.Socket;
+import java.lang.*;
 
-public class Client {
+
+public class Client extends DataSender {
     Socket socket;
-    PrintWriter printWriter;
-    BufferedReader bufferedReader;
-
-    ObjectOutputStream objectWriter;
-    ObjectInputStream objectReader;
     Controller controller;
+
+    boolean waitingForResponse;
+    long sentTimeStamp;
+    Dataflow response;
 
     public static void main(String args[]) {
         (new Client()).go();
+    }
+
+    public Client() {
+        super();
+        waitingForResponse = false;
     }
 
     public void go() {
@@ -24,25 +27,27 @@ public class Client {
         //server connection
         try {
             socket = new Socket("127.0.0.1", 5000);
-            bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            printWriter = new PrintWriter(socket.getOutputStream());
 
             objectWriter = new ObjectOutputStream(socket.getOutputStream());
             objectReader = new ObjectInputStream(socket.getInputStream());
 
-            sendInstruct(Instruct.SUCCESSFUL_CONNECTION);
+            sendData(new Dataflow(Instruct.SUCCESSFUL_CONNECTION));
 
             controller = new Controller(this);
 
-            Instruct line;
+            Dataflow data;
             boolean cont = true;
-            while ((line = receiveInstruct()) != null && cont) { //communication logic
-                switch(line) {
+            while ((data = receiveData()) != null && cont) { //communication logic
+                switch(data.getInstruct()) {
                     case SUCCESSFUL_CONNECTION:
                         System.out.println("Successful connection with server!");
                         break;
                     case QUIT:
                         cont = false;
+                        break;
+                    case AUTH_RESULT:
+                        response = data;
+                        waitingForResponse = false;
                         break;
                     default:
                         System.out.println("Something unexpected happened");
@@ -54,23 +59,21 @@ public class Client {
         }
     }
 
-    private void sendInstruct(Instruct in) {
-        printWriter.println(in);
-        printWriter.flush();
-    }
+    public ReqResult signinreq(String username, String password) {
+        Dataflow df = new Dataflow(Instruct.SIGNIN_ATTEMPT);
+        df.add(username);
+        df.add(password);
+        sendData(df);
 
-    private Instruct receiveInstruct() {
-        try {
-            String retval = bufferedReader.readLine();
-            return Instruct.valueOf(retval);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+        waitingForResponse = true;
+
+        sentTimeStamp = System.currentTimeMillis();
+
+        while (waitingForResponse) {
+            if (System.currentTimeMillis() > sentTimeStamp + allowedDelay)
+                return ReqResult.CONN_FAIL;
         }
-    }
 
-
-    public boolean signinreq(String username, String password) {
-        return false;
+        return (ReqResult)response.getNext();
     }
 }

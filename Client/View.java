@@ -4,10 +4,18 @@ import javax.swing.*;
 public class View {
     Controller controller;
     JFrame jFrame;
+    JLabel errorLabel;
+
     public View(Controller c) {
         controller = c;
         jFrame = new JFrame();
         jFrame.setSize(500, 500);
+
+        errorLabel = new JLabel();
+    }
+
+    public void setError(String err) {
+        errorLabel.setText(err);
     }
 
     public void newWindow(JPanel p) {
@@ -50,6 +58,7 @@ public class View {
         centerPanel.add(label);
         centerPanel.add(username.getPanel());
         centerPanel.add(password.getPanel());
+        centerPanel.add(errorLabel);
         centerPanel.add(signin);
         centerPanel.add(signup);
     
@@ -94,6 +103,7 @@ public class View {
         centerPanel.add(username.getPanel());
         centerPanel.add(password.getPanel());
         centerPanel.add(confPassword.getPanel());
+        centerPanel.add(errorLabel);
         centerPanel.add(createAccount);
         centerPanel.add(back);
     

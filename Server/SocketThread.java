@@ -1,47 +1,45 @@
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
 import java.net.Socket;
 
 //server side!!
 //maintains connection with client and account
-public class SocketThread implements Runnable {
+public class SocketThread extends DataSender implements Runnable {
     Socket conn; //server side socket
-    BufferedReader bufferedReader;
-    PrintWriter printWriter;
+    Server server;
+
     AccountManager accountManager;
 
-    ObjectOutputStream objectWriter;
-    ObjectInputStream objectReader;
-
-    public SocketThread(Socket c) {
+    public SocketThread(Socket c, Server s) {
+        super();
         conn = c;
+        server = s;
+        accountManager = AccountManager.getInstance();
     }
 
     @Override
     public void run() {
         try {
             System.out.println("new server thread to handle new client");
-            bufferedReader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            printWriter = new PrintWriter(conn.getOutputStream());
 
             objectWriter = new ObjectOutputStream(conn.getOutputStream());
             objectReader = new ObjectInputStream(conn.getInputStream());
 
-            sendInstruct(Instruct.SUCCESSFUL_CONNECTION);
+            sendData(new Dataflow(Instruct.SUCCESSFUL_CONNECTION));
 
-            Instruct line;
+            Dataflow line;
             boolean cont = true;
-            while ((line = receiveInstruct()) != null && cont) { //communication logic
-                switch(line) {
+            while ((line = receiveData()) != null && cont) { //communication logic
+                switch(line.getInstruct()) {
                     case SUCCESSFUL_CONNECTION:
                         System.out.println("Successful connection with client!");
                         break;
                     case QUIT:
                         cont = false;
+                        break;
+                    case SIGNIN_ATTEMPT:
+                        signinAttempt((String)line.getNext(), (String)line.getNext());
                         break;
                     default:
                         System.out.println("Something unexpected happened");
@@ -55,17 +53,12 @@ public class SocketThread implements Runnable {
     }
 
 
-    public void sendInstruct(Instruct in) {
-        printWriter.println(in);
-        printWriter.flush();
+    public void signinAttempt(String username, String password) {
+        Dataflow df = new Dataflow(Instruct.AUTH_RESULT);
+
+        df.add(ReqResult.BAD_AUTH);
+
+        sendData(df);
     }
 
-    public Instruct receiveInstruct() {
-        try {
-            String retval = bufferedReader.readLine();
-            return Instruct.valueOf(retval);
-        } catch (IOException e) {
-            return null;
-        }
-    }
 }
