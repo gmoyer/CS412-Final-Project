@@ -12,13 +12,10 @@ public class Client extends DataSender {
     long sentTimeStamp;
     Dataflow response;
 
-    public static void main(String args[]) {
-        (new Client()).go();
-    }
-
-    public Client() {
+    public Client(Controller c) {
         super();
-        waitingForResponse = false;
+        controller = c;
+        go();
     }
 
     public void go() {
@@ -32,11 +29,10 @@ public class Client extends DataSender {
 
             sendData(new Dataflow(Instruct.SUCCESSFUL_CONNECTION));
 
-            controller = new Controller(this);
-
             Dataflow data;
             boolean cont = true;
             while ((data = receiveData()) != null && cont) { //communication logic
+                System.out.println("New Data: " + data.getInstruct().toString());
                 switch(data.getInstruct()) {
                     case SUCCESSFUL_CONNECTION:
                         System.out.println("Successful connection with server!");
@@ -47,6 +43,7 @@ public class Client extends DataSender {
                     case AUTH_RESULT:
                         response = data;
                         waitingForResponse = false;
+                        System.out.println("Set waitingForResponse to false");
                         break;
                     default:
                         System.out.println("Something unexpected happened");
@@ -62,13 +59,16 @@ public class Client extends DataSender {
         Dataflow df = new Dataflow(Instruct.SIGNIN_ATTEMPT);
         df.add(username);
         df.add(password);
-        sendData(df);
 
         waitingForResponse = true;
+        sendData(df);
+
 
         sentTimeStamp = System.currentTimeMillis();
 
-        while (waitingForResponse) {
+        boolean waiting = true;
+        while (waiting) {
+            waiting = waitingForResponse;
             if (System.currentTimeMillis() > sentTimeStamp + allowedDelay)
                 return ReqResult.CONN_FAIL;
         }
@@ -82,15 +82,20 @@ public class Client extends DataSender {
         df.add(username);
         df.add(password);
         df.add(confPassword);
-        sendData(df);
 
         waitingForResponse = true;
+        sendData(df);
+
+        
 
         sentTimeStamp = System.currentTimeMillis();
 
-        while (waitingForResponse) {
+        boolean waiting = true;
+        while (waiting) {
+            waiting = waitingForResponse;
             if (System.currentTimeMillis() > sentTimeStamp + allowedDelay)
                 return ReqResult.CONN_FAIL;
+            //System.out.println("waiting for response is " + waitingForResponse);
         }
 
         return (ReqResult)response.getNext();

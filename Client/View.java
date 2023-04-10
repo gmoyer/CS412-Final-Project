@@ -45,9 +45,6 @@ public class View {
         Button signin = new Button("Sign in", ButtonID.SIGN_IN);
         Button signup = new Button("Sign up", ButtonID.SIGN_UP);
 
-        signin.addActionListener(controller);
-        signup.addActionListener(controller);
-
         signin.setAlignmentX(Component.CENTER_ALIGNMENT);
         signup.setAlignmentX(Component.CENTER_ALIGNMENT);
 
@@ -96,9 +93,6 @@ public class View {
         Button createAccount = new Button("Create Account", ButtonID.CREATE_ACCOUNT);
         Button back = new Button("Back", ButtonID.BACK_SIGN_IN);
 
-        createAccount.addActionListener(controller);
-        back.addActionListener(controller);
-
         createAccount.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         createAccount.addTextField(name);
@@ -130,6 +124,47 @@ public class View {
 
         centerPanel.setBackground(new Color(255, 0, 0));
         container.setBackground(new Color(0, 255, 0));
+
+        newWindow(container);
+    }
+
+    public void navMain() {
+        JPanel container = new JPanel(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+
+        //Columns: 7
+        //Rows: 7
+
+        Button signoutButton = new Button("Sign out", ButtonID.SIGN_OUT);
+        c.gridx = 6;
+        c.gridy = 0;
+        container.add(signoutButton, c);
+
+        Button addToBet = new Button("+", ButtonID.ADD_TO_BET);
+        c.gridx = 1;
+        c.gridy = 4;
+        container.add(addToBet, c);
+
+        Button removeFromBet = new Button("-", ButtonID.REMOVE_FROM_BET);
+        c.gridx = 5;
+        c.gridy = 4;
+        container.add(removeFromBet, c);
+
+        Button chooseHeads = new Button("Heads", ButtonID.CHOOSE_HEADS);
+        c.gridx = 2;
+        c.gridy = 5;
+        container.add(chooseHeads, c);
+
+        Button chooseTails = new Button("Tails", ButtonID.CHOOSE_TAILS);
+        c.gridx = 4;
+        c.gridy = 5;
+        container.add(chooseTails, c);
+
+        Button flip = new Button("Flip!", ButtonID.FLIP);
+        c.gridx = 3;
+        c.gridy = 6;
+        container.add(flip, c);
+
 
         newWindow(container);
     }

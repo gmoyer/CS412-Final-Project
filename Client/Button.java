@@ -9,17 +9,22 @@ public class Button extends JButton {
 
     public Button() {
         super();
-        fields = new ArrayList<TextField>();
+        init();
     }
     public Button(String name) {
         super(name);
-        fields = new ArrayList<TextField>();
+        init();
     }
 
     public Button(String name, ButtonID i) {
         super(name);
         bid = i;
+        init();
+    }
+
+    private void init() {
         fields = new ArrayList<TextField>();
+        addActionListener(Controller.getInstance());
     }
 
     public void setID(ButtonID i) {

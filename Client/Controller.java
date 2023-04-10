@@ -6,11 +6,27 @@ import java.security.MessageDigest;
 public class Controller implements ActionListener {
     View view;
     Client client;
-    public Controller(Client c) {
-        view = new View(this);
-        client = c;
+    private static Controller controller;
 
-        view.navSignin();
+    public static void main(String argv[]) {
+        getInstance().go();
+    }
+
+    private Controller() {
+        view = new View(this);
+        //client = new Client(this);
+    }
+
+    public static Controller getInstance() {
+        if (controller == null)
+            controller = new Controller();
+        return controller;
+    }
+
+    public void go() {
+        //view.navSignin();
+
+        view.navMain();
     }
 
 
@@ -19,7 +35,7 @@ public class Controller implements ActionListener {
         Button clickedButton = (Button)e.getSource();
 
         switch (clickedButton.getID()) {
-            case SIGN_IN: signinClicked(clickedButton);
+            case SIGN_IN: signin(clickedButton);
                 break;
             case SIGN_UP: view.navSignup();
                 break;
@@ -27,10 +43,12 @@ public class Controller implements ActionListener {
                 break;
             case BACK_SIGN_IN: view.navSignin();
                 break;
+            default:
+                System.out.println("Unhandled response " + clickedButton.getID().toString());
         }
     }
 
-    public void signinClicked(Button button) {
+    public void signin(Button button) {
         String username = button.getTextField(TextFieldID.USERNAME);
         String password = button.getTextField(TextFieldID.PASSWORD);
 
@@ -38,10 +56,11 @@ public class Controller implements ActionListener {
 
         ReqResult result = client.signinreq(username, hashword);
 
-        view.setError(result.getMessage());
 
         if (!result.isSuccessful()) {
-            //view.setError(result.getMessage());
+            view.setError(result.getMessage());
+        } else {
+            view.navMain();
         }
     }
 
@@ -56,7 +75,10 @@ public class Controller implements ActionListener {
 
         ReqResult result = client.signupreq(name, username, hashword, confHashword);
 
-        view.setError(result.getMessage());
+        if (!result.isSuccessful())
+            view.setError(result.getMessage());
+        else
+            view.navMain();
     }
 
 

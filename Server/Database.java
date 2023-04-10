@@ -52,20 +52,20 @@ public class Database {
         executeUpdate(String.format("INSERT INTO users (username) VALUES ('%s');", username));
     }
     public int getID(String username) {
-        String cmd = "SELECT id FROM users WHERE username="+username+";";
+        String cmd = "SELECT * FROM users WHERE username='"+username+"';";
         System.out.println(cmd);
         ResultSet rs = executeQuery(cmd);
         try {
-            int resultsFetched = rs.getFetchSize();
-            if (resultsFetched == 0) {
+            if (!rs.next()) {
                 System.out.println("Could not find username");
                 return -1; //username not found
-            } else if (resultsFetched == 1) {
-                //good
-                rs.absolute(1);
-                System.out.println("Successfully retrieved ID " + rs.getInt("id"));
-                return rs.getInt("id");
-            } else { //username overlap (uh oh)
+            }
+            //retrieve id from first entry
+            int id = rs.getInt("id");
+            System.out.println("Successfully retrieved ID " + rs.getInt("id"));
+            if (!rs.next()) { //if there are no others
+                return id; //return the id
+            } else { //Theres another entry, meaning we have username overlap
                 System.out.println("CRITICAL: USERNAME OVERLAP");
                 return -1;
             }
