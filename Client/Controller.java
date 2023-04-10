@@ -38,8 +38,10 @@ public class Controller implements ActionListener {
 
         ReqResult result = client.signinreq(username, hashword);
 
+        view.setError(result.getMessage());
+
         if (!result.isSuccessful()) {
-            view.setError(result.getMessage());
+            //view.setError(result.getMessage());
         }
     }
 
@@ -52,7 +54,9 @@ public class Controller implements ActionListener {
         String hashword = sha256(password);
         String confHashword = sha256(confPassword);
 
-        //client.signupreq(name, username, hashword, confHashword);
+        ReqResult result = client.signupreq(name, username, hashword, confHashword);
+
+        view.setError(result.getMessage());
     }
 
 

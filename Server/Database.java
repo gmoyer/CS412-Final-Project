@@ -12,13 +12,13 @@ public class Database {
     private Database() {
         //create the SQL library if not created
         try {
-            conn = DriverManager.getConnection("jdbc:sqlite:serverdata.db");
+            conn = DriverManager.getConnection("jdbc:sqlite:serverdata.sqlite");
             String cmd = "CREATE TABLE IF NOT EXISTS users (" +
                     "id INTEGER PRIMARY KEY," +
                     "name STRING," +
                     "username STRING," +
                     "password STRING," +
-                    "money INTEGER" +
+                    "money INTEGER," +
                     "flipCount INTEGER);";
             executeUpdate(cmd);
         } catch (SQLException e) {
@@ -52,15 +52,18 @@ public class Database {
         executeUpdate(String.format("INSERT INTO users (username) VALUES ('%s');", username));
     }
     public int getID(String username) {
-        String cmd = "SELECT id FROM users WHERE username='"+username+"'";
+        String cmd = "SELECT id FROM users WHERE username="+username+";";
+        System.out.println(cmd);
         ResultSet rs = executeQuery(cmd);
         try {
             int resultsFetched = rs.getFetchSize();
             if (resultsFetched == 0) {
+                System.out.println("Could not find username");
                 return -1; //username not found
             } else if (resultsFetched == 1) {
                 //good
                 rs.absolute(1);
+                System.out.println("Successfully retrieved ID " + rs.getInt("id"));
                 return rs.getInt("id");
             } else { //username overlap (uh oh)
                 System.out.println("CRITICAL: USERNAME OVERLAP");
@@ -92,7 +95,7 @@ public class Database {
     }
 
     public void updateValue(Entry e, Field f) {
-        String cmd = String.format("UPDATE users SET %s = %s WHERE id = %d;", e.getField(Field.NAME).toString(), f.SQL(e.getField(f).toString()), e.getField(Field.ID));
+        String cmd = String.format("UPDATE users SET %s = %s WHERE id = %d;", f.getName(), f.SQL(e.getField(f).toString()), e.getField(Field.ID));
         executeUpdate(cmd);
     }
 

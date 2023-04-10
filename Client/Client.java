@@ -2,7 +2,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.lang.*;
 
 
 public class Client extends DataSender {
@@ -63,6 +62,26 @@ public class Client extends DataSender {
         Dataflow df = new Dataflow(Instruct.SIGNIN_ATTEMPT);
         df.add(username);
         df.add(password);
+        sendData(df);
+
+        waitingForResponse = true;
+
+        sentTimeStamp = System.currentTimeMillis();
+
+        while (waitingForResponse) {
+            if (System.currentTimeMillis() > sentTimeStamp + allowedDelay)
+                return ReqResult.CONN_FAIL;
+        }
+
+        return (ReqResult)response.getNext();
+    }
+
+    public ReqResult signupreq(String name, String username, String password, String confPassword) {
+        Dataflow df = new Dataflow(Instruct.SIGNUP_ATTEMPT);
+        df.add(name);
+        df.add(username);
+        df.add(password);
+        df.add(confPassword);
         sendData(df);
 
         waitingForResponse = true;

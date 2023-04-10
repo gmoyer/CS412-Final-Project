@@ -27,6 +27,8 @@ public class View {
     }
 
     public void navSignin() {
+        setError("");
+
         JPanel container = new JPanel(new GridBagLayout());
         JPanel centerPanel = new JPanel();
 
@@ -55,10 +57,15 @@ public class View {
         //panel.setLayout(new BorderLayout());
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
 
+
+        JPanel errorLabelPanel = new JPanel();
+        errorLabelPanel.add(errorLabel);
+        errorLabelPanel.setMinimumSize(new Dimension(0, 50));
+
         centerPanel.add(label);
         centerPanel.add(username.getPanel());
         centerPanel.add(password.getPanel());
-        centerPanel.add(errorLabel);
+        centerPanel.add(errorLabelPanel);
         centerPanel.add(signin);
         centerPanel.add(signup);
     
@@ -69,13 +76,15 @@ public class View {
 
         container.add(centerPanel);
 
-        centerPanel.setBackground(new Color(255, 0, 0));
-        container.setBackground(new Color(0, 255, 0));
+        //centerPanel.setBackground(new Color(255, 0, 0));
+        //container.setBackground(new Color(0, 255, 0));
 
         newWindow(container);
     }
 
     public void navSignup() {
+        setError("");
+        
         JPanel container = new JPanel(new GridBagLayout());
         JPanel centerPanel = new JPanel();
 
@@ -99,18 +108,23 @@ public class View {
 
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
 
+
+        JPanel errorLabelPanel = new JPanel();
+        errorLabelPanel.add(errorLabel);
+        errorLabelPanel.setMinimumSize(new Dimension(0, 50));
+
         centerPanel.add(name.getPanel());
         centerPanel.add(username.getPanel());
         centerPanel.add(password.getPanel());
         centerPanel.add(confPassword.getPanel());
-        centerPanel.add(errorLabel);
+        centerPanel.add(errorLabelPanel);
         centerPanel.add(createAccount);
         centerPanel.add(back);
     
-        centerPanel.setMaximumSize(new Dimension(300, 400));
+        centerPanel.setMaximumSize(new Dimension(300, 500));
 
-        centerPanel.setAlignmentY(Component.CENTER_ALIGNMENT);
-        centerPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        //centerPanel.setAlignmentY(Component.CENTER_ALIGNMENT);
+        //centerPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         container.add(centerPanel);
 

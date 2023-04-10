@@ -41,6 +41,9 @@ public class SocketThread extends DataSender implements Runnable {
                     case SIGNIN_ATTEMPT:
                         signinAttempt((String)line.getNext(), (String)line.getNext());
                         break;
+                    case SIGNUP_ATTEMPT:
+                        signupAttempt((String)line.getNext(), (String)line.getNext(), (String)line.getNext(), (String)line.getNext());
+                        break;
                     default:
                         System.out.println("Something unexpected happened");
                         break;
@@ -54,9 +57,35 @@ public class SocketThread extends DataSender implements Runnable {
 
 
     public void signinAttempt(String username, String password) {
+
+        ReqResult result = accountManager.loadAccount(username, password);
+
         Dataflow df = new Dataflow(Instruct.AUTH_RESULT);
 
-        df.add(ReqResult.BAD_AUTH);
+        df.add(result);
+
+        if (result.isSuccessful()) {
+            Entry entry = accountManager.getActiveEntry();
+            df.add(entry.getField(Field.NAME));
+            df.add(entry.getField(Field.MONEY));
+        }
+
+        sendData(df);
+    }
+
+    public void signupAttempt(String name, String username, String password, String confPassword) {
+
+        ReqResult result = accountManager.createAccount(name, username, password, confPassword);
+
+        Dataflow df = new Dataflow(Instruct.AUTH_RESULT);
+
+        df.add(result);
+
+        if (result.isSuccessful()) {
+            Entry entry = accountManager.getActiveEntry();
+            df.add(entry.getField(Field.NAME));
+            df.add(entry.getField(Field.MONEY));
+        }
 
         sendData(df);
     }
