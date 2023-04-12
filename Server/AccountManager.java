@@ -40,6 +40,8 @@ public class AccountManager {
 
         entry = new Entry(database, username, false);
 
+        //System.out.println("Comparing " + entry.getField(Field.PASSWORD) + " and " + password);
+
         if (entry.getField(Field.PASSWORD).equals(password)) {
             return ReqResult.GOOD_AUTH;
         } else {

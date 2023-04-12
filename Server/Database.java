@@ -53,7 +53,7 @@ public class Database {
     }
     public int getID(String username) {
         String cmd = "SELECT * FROM users WHERE username='"+username+"';";
-        System.out.println(cmd);
+        //System.out.println(cmd);
         ResultSet rs = executeQuery(cmd);
         try {
             if (!rs.next()) {
@@ -80,8 +80,9 @@ public class Database {
         String cmd = "SELECT * FROM users WHERE id="+id;
         try {
             ResultSet rs = executeQuery(cmd);
-            if (rs.getFetchSize() != 1) {
-                return false; //unsuccessful fetch
+            if (!rs.next()) {
+                //unsuccessful fetch
+                return false;
             }
 
             for (Field f : Field.values()) {

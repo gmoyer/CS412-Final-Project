@@ -1,16 +1,10 @@
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 
 public class Client extends DataSender {
     Socket socket;
     Controller controller;
-
-    boolean waitingForResponse;
-    long sentTimeStamp;
-    Dataflow response;
 
     public Client(Controller c) {
         super();
@@ -22,37 +16,36 @@ public class Client extends DataSender {
 
         //server connection
         try {
-            socket = new Socket("127.0.0.1", 5000);
-
-            objectWriter = new ObjectOutputStream(socket.getOutputStream());
-            objectReader = new ObjectInputStream(socket.getInputStream());
-
-            sendData(new Dataflow(Instruct.SUCCESSFUL_CONNECTION));
-
-            Dataflow data;
-            boolean cont = true;
-            while ((data = receiveData()) != null && cont) { //communication logic
-                System.out.println("New Data: " + data.getInstruct().toString());
-                switch(data.getInstruct()) {
-                    case SUCCESSFUL_CONNECTION:
-                        System.out.println("Successful connection with server!");
-                        break;
-                    case QUIT:
-                        cont = false;
-                        break;
-                    case AUTH_RESULT:
-                        response = data;
-                        waitingForResponse = false;
-                        System.out.println("Set waitingForResponse to false");
-                        break;
-                    default:
-                        System.out.println("Something unexpected happened");
-                        break;
-                }
-            }
+            init(new Socket("127.0.0.1", 5000));
         } catch (IOException e) {
             e.printStackTrace();
         }
+        commThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Dataflow data;
+                boolean cont = true;
+                while ((data = receiveData()) != null && cont) { //communication logic
+                    System.out.println("New Data: " + data.getInstruct().toString());
+                    switch(data.getInstruct()) {
+                        case SUCCESSFUL_CONNECTION:
+                            System.out.println("Successful connection with server!");
+                            break;
+                        case QUIT:
+                            cont = false;
+                            break;
+                        case AUTH_RESULT:
+                            System.out.println("Recieved auth result");
+                            break;
+                        default:
+                            System.out.println("Unhandled " + data.getInstruct().toString());
+                            break;
+                    }
+                }
+                System.out.println("Quitting...");
+            }
+        });
+        commThread.start();
     }
 
     public ReqResult signinreq(String username, String password) {
@@ -60,18 +53,10 @@ public class Client extends DataSender {
         df.add(username);
         df.add(password);
 
-        waitingForResponse = true;
-        sendData(df);
+        Dataflow response = query(df, Instruct.AUTH_RESULT);
 
-
-        sentTimeStamp = System.currentTimeMillis();
-
-        boolean waiting = true;
-        while (waiting) {
-            waiting = waitingForResponse;
-            if (System.currentTimeMillis() > sentTimeStamp + allowedDelay)
-                return ReqResult.CONN_FAIL;
-        }
+        if (response == null)
+            return ReqResult.CONN_FAIL;
 
         return (ReqResult)response.getNext();
     }
@@ -83,20 +68,10 @@ public class Client extends DataSender {
         df.add(password);
         df.add(confPassword);
 
-        waitingForResponse = true;
-        sendData(df);
+        Dataflow response = query(df, Instruct.AUTH_RESULT);
 
-        
-
-        sentTimeStamp = System.currentTimeMillis();
-
-        boolean waiting = true;
-        while (waiting) {
-            waiting = waitingForResponse;
-            if (System.currentTimeMillis() > sentTimeStamp + allowedDelay)
-                return ReqResult.CONN_FAIL;
-            //System.out.println("waiting for response is " + waitingForResponse);
-        }
+        if (response == null)
+            return ReqResult.CONN_FAIL;
 
         return (ReqResult)response.getNext();
     }

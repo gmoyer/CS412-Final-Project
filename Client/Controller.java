@@ -14,7 +14,7 @@ public class Controller implements ActionListener {
 
     private Controller() {
         view = new View(this);
-        //client = new Client(this);
+        client = new Client(this);
     }
 
     public static Controller getInstance() {
@@ -24,9 +24,9 @@ public class Controller implements ActionListener {
     }
 
     public void go() {
-        //view.navSignin();
+        view.navSignin();
 
-        view.navMain();
+        //view.navMain();
     }
 
 
