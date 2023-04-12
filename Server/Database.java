@@ -62,7 +62,7 @@ public class Database {
             }
             //retrieve id from first entry
             int id = rs.getInt("id");
-            System.out.println("Successfully retrieved ID " + rs.getInt("id"));
+            //System.out.println("Successfully retrieved ID " + rs.getInt("id"));
             if (!rs.next()) { //if there are no others
                 return id; //return the id
             } else { //Theres another entry, meaning we have username overlap
