@@ -9,12 +9,17 @@ import javax.swing.*;
 public class View {
     Controller controller;
     JFrame jFrame;
+
+    //specific elements that need to be updated
     JLabel errorLabel;
+    JLabel betAmount;
+    JLabel coinImage;
+    JLabel[] leaderboard;
 
     public View(Controller c) {
         controller = c;
         jFrame = new JFrame();
-        jFrame.setSize(500, 500);
+        jFrame.setSize(809, 500); //golden ratio :)
 
         //on exit
         jFrame.addWindowListener(new java.awt.event.WindowAdapter() {
@@ -144,46 +149,83 @@ public class View {
         JPanel container = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
 
-        //Columns: 7
-        //Rows: 7
+        //Columns: 9
+        //Rows: 10
+
+        JLabel leaderboardLabel = new JLabel("Leaderboard");
+        c.gridx = 0;
+        c.gridy = 0;
+        container.add(leaderboardLabel, c);
+
+        leaderboard = new JLabel[3];
+
+        /*
+        leaderboard[0] = new JLabel("happy");
+        c.gridx = 0;
+        c.gridy = 1;
+        container.add(leaderboard[0], c);
+
+        leaderboard[1] = new JLabel("sad");
+        c.gridx = 0;
+        c.gridy = 2;
+        container.add(leaderboard[1], c);
+
+        leaderboard[2] = new JLabel("funny");
+        c.gridx = 0;
+        c.gridy = 3;
+        container.add(leaderboard[2], c);
+        */
+
+
+        int pady = 10;
+        int padx = 5;
+        c.ipady = pady;
+        c.ipadx = padx;
+        c.insets = new Insets(pady/2, padx/2, pady/2, padx/2);
 
         Button signoutButton = new Button("Sign out", ButtonID.SIGN_OUT);
-        c.gridx = 6;
+        c.gridx = 8;
         c.gridy = 0;
         container.add(signoutButton, c);
 
         Button addToBet = new Button("+", ButtonID.ADD_TO_BET);
-        c.gridx = 1;
-        c.gridy = 4;
+        c.gridx = 6;
+        c.gridy = 7;
         container.add(addToBet, c);
 
         Button removeFromBet = new Button("-", ButtonID.REMOVE_FROM_BET);
-        c.gridx = 5;
-        c.gridy = 4;
+        c.gridx = 2;
+        c.gridy = 7;
         container.add(removeFromBet, c);
 
         Button chooseHeads = new Button("Heads", ButtonID.CHOOSE_HEADS);
-        c.gridx = 2;
-        c.gridy = 5;
+        c.gridx = 3;
+        c.gridy = 8;
         container.add(chooseHeads, c);
 
         Button chooseTails = new Button("Tails", ButtonID.CHOOSE_TAILS);
-        c.gridx = 4;
-        c.gridy = 5;
+        c.gridx = 5;
+        c.gridy = 8;
         container.add(chooseTails, c);
 
         Button flip = new Button("Flip!", ButtonID.FLIP);
-        c.gridx = 3;
-        c.gridy = 6;
+        c.gridx = 4;
+        c.gridy = 9;
         container.add(flip, c);
+
+        betAmount = new JLabel("Current bet: $00");
+        c.gridx = 3;
+        c.gridy = 7;
+        c.gridwidth = 3;
+        container.add(betAmount, c);
 
         //images
         try {
             BufferedImage headsCoin = ImageIO.read(new File("images/Heads.png"));
-            JLabel headsLabel = new JLabel(new ImageIcon(headsCoin));
+            coinImage = new JLabel(new ImageIcon(headsCoin.getScaledInstance(100, 100, Image.SCALE_FAST)));
             c.gridx = 3;
-            c.gridy = 3;
-            container.add(headsLabel, c);
+            c.gridy = 6;
+            container.add(coinImage, c);
         } catch (IOException e) {
             e.printStackTrace();
         }
