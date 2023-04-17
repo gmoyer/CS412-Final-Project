@@ -1,6 +1,11 @@
 import java.io.IOException;
 import java.net.Socket;
 
+import com.communication.Dataflow;
+import com.communication.Instruct;
+import com.communication.ReqResult;
+import com.communication.DataSender;
+
 
 public class Client extends DataSender {
     Socket socket;
