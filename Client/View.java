@@ -1,4 +1,9 @@
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
 import javax.swing.*;
 
 public class View {
@@ -10,6 +15,13 @@ public class View {
         controller = c;
         jFrame = new JFrame();
         jFrame.setSize(500, 500);
+
+        //on exit
+        jFrame.addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent e) {
+                controller.close();
+            }
+        });
 
         errorLabel = new JLabel();
     }
@@ -164,6 +176,17 @@ public class View {
         c.gridx = 3;
         c.gridy = 6;
         container.add(flip, c);
+
+        //images
+        try {
+            BufferedImage headsCoin = ImageIO.read(new File("images/Heads.png"));
+            JLabel headsLabel = new JLabel(new ImageIcon(headsCoin));
+            c.gridx = 3;
+            c.gridy = 3;
+            container.add(headsLabel, c);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
 
         newWindow(container);

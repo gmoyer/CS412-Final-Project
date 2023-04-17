@@ -31,6 +31,10 @@ public class Controller implements ActionListener {
         view.navMain();
     }
 
+    public void close() {
+        System.exit(0);
+    }
+
 
     @Override
     public void actionPerformed(ActionEvent e) {
