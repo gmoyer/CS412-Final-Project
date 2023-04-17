@@ -1,3 +1,4 @@
+import com.communication.ReqResult;
 
 //server and client side
 //communicates with SocketThread, Database, and Entry

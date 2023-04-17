@@ -2,6 +2,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.security.MessageDigest;
 
+import com.communication.ReqResult;
+
 //client side
 public class Controller implements ActionListener {
     View view;
@@ -14,7 +16,7 @@ public class Controller implements ActionListener {
 
     private Controller() {
         view = new View(this);
-        client = new Client(this);
+        //client = new Client(this);
     }
 
     public static Controller getInstance() {
@@ -24,9 +26,9 @@ public class Controller implements ActionListener {
     }
 
     public void go() {
-        view.navSignin();
+        //view.navSignin();
 
-        //view.navMain();
+        view.navMain();
     }
 
 
