@@ -159,22 +159,12 @@ public class View {
 
         leaderboard = new JLabel[3];
 
-        /*
-        leaderboard[0] = new JLabel("happy");
-        c.gridx = 0;
-        c.gridy = 1;
-        container.add(leaderboard[0], c);
-
-        leaderboard[1] = new JLabel("sad");
-        c.gridx = 0;
-        c.gridy = 2;
-        container.add(leaderboard[1], c);
-
-        leaderboard[2] = new JLabel("funny");
-        c.gridx = 0;
-        c.gridy = 3;
-        container.add(leaderboard[2], c);
-        */
+        for (int i = 0; i < 2; i++) {
+            leaderboard[i] = new JLabel("");
+            c.gridx = 0;
+            c.gridy = i+1;
+            container.add(leaderboard[i], c);
+        }
 
 
         int pady = 10;
@@ -232,5 +222,11 @@ public class View {
 
 
         newWindow(container);
+    }
+
+    public void updateLeader(int index, String text) {
+        if (index >= 0 && index <= 2) {
+            leaderboard[index].setText(text);
+        }
     }
 }

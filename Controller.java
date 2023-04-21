@@ -1,8 +1,9 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.security.MessageDigest;
+import java.util.List;
 
-import com.communication.ReqResult;
+import custom.communication.ReqResult;
+import custom.Util;
 
 //client side
 public class Controller implements ActionListener {
@@ -16,7 +17,7 @@ public class Controller implements ActionListener {
 
     private Controller() {
         view = new View(this);
-        //client = new Client(this);
+        client = new Client(this);
     }
 
     public static Controller getInstance() {
@@ -26,9 +27,9 @@ public class Controller implements ActionListener {
     }
 
     public void go() {
-        //view.navSignin();
+        view.navSignin();
 
-        view.navMain();
+        //view.navMain();
     }
 
     public void close() {
@@ -58,7 +59,7 @@ public class Controller implements ActionListener {
         String username = button.getTextField(TextFieldID.USERNAME);
         String password = button.getTextField(TextFieldID.PASSWORD);
 
-        String hashword = sha256(password);
+        String hashword = Util.sha256(password);
 
         ReqResult result = client.signinreq(username, hashword);
 
@@ -76,8 +77,8 @@ public class Controller implements ActionListener {
         String password = button.getTextField(TextFieldID.PASSWORD);
         String confPassword = button.getTextField(TextFieldID.CONFIRM_PASSWORD);
 
-        String hashword = sha256(password);
-        String confHashword = sha256(confPassword);
+        String hashword = Util.sha256(password);
+        String confHashword = Util.sha256(confPassword);
 
         ReqResult result = client.signupreq(name, username, hashword, confHashword);
 
@@ -87,22 +88,13 @@ public class Controller implements ActionListener {
             view.navMain();
     }
 
+    public void updateLeaderboard(List<?> list) {
+        int leaderboardSize = 3;
+        if (list.size() < 3)
+            leaderboardSize = list.size();
 
-    //Client side. Pulled from https://stackoverflow.com/a/11009612
-    public static String sha256(final String base) {
-        try{
-            final MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            final byte[] hash = digest.digest(base.getBytes("UTF-8"));
-            final StringBuilder hexString = new StringBuilder();
-            for (int i = 0; i < hash.length; i++) {
-                final String hex = Integer.toHexString(0xff & hash[i]);
-                if(hex.length() == 1) 
-                  hexString.append('0');
-                hexString.append(hex);
-            }
-            return hexString.toString();
-        } catch(Exception ex){
-           throw new RuntimeException(ex);
+        for (int i = 0; i < leaderboardSize; i++) {
+            view.updateLeader(i, (String)list.get(i));
         }
     }
 }

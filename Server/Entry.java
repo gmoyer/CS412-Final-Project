@@ -6,8 +6,8 @@ public class Entry {
     private HashMap<String, Object> fields;
     private Database database;
 
-    public Entry(Database db, String username, boolean newEntry) {
-        this.database = db;
+    public Entry(String username, boolean newEntry) {
+        this.database = Database.getInstance();
         fields = new HashMap<String, Object>();
 
         //populate with default values
@@ -24,6 +24,8 @@ public class Entry {
             fetch();
         }
     }
+
+    public Entry() {} //assumes every field will be populated
 
     private void create() { //new entry
         String username = (String)getField(Field.USERNAME);

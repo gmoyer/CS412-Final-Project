@@ -1,4 +1,6 @@
-import com.communication.ReqResult;
+import java.util.ArrayList;
+
+import custom.communication.ReqResult;
 
 //server and client side
 //communicates with SocketThread, Database, and Entry
@@ -26,7 +28,7 @@ public class AccountManager {
             return ReqResult.NON_UNIQUE_USERNAME;
         }
 
-        entry = new Entry(database, username, true);
+        entry = new Entry(username, true);
         entry.setField(Field.NAME, name);
         entry.setField(Field.PASSWORD, password);
         
@@ -39,7 +41,7 @@ public class AccountManager {
             return ReqResult.BAD_AUTH;
         }
 
-        entry = new Entry(database, username, false);
+        entry = new Entry(username, false);
 
         //System.out.println("Comparing " + entry.getField(Field.PASSWORD) + " and " + password);
 
@@ -52,5 +54,23 @@ public class AccountManager {
 
     public Entry getActiveEntry() {
         return entry;
+    }
+
+    public ArrayList<String> getLeaderboard() {
+        ArrayList<String> leaderboardText = new ArrayList<String>();
+
+        ArrayList<Entry> entries = database.getAllEntries();
+
+        int leaderboardSize = 3;
+        if (entries.size() < 3)
+            leaderboardSize = entries.size();
+
+        for (int i = 0; i < leaderboardSize; i++) {
+            Entry e = entries.get(i);
+            String txt = "$" + e.getField(Field.MONEY) + " - " + e.getField(Field.USERNAME);
+            leaderboardText.add(txt);
+        }
+
+        return leaderboardText;
     }
 }

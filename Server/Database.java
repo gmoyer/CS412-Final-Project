@@ -2,6 +2,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 //server side
 //communicates with Entry and AccountManager
@@ -93,6 +94,26 @@ public class Database {
             err.printStackTrace();
             return false; //unsuccessful fetch
         }
+    }
+
+    public ArrayList<Entry> getAllEntries() {
+        ArrayList<Entry> leaderboard = new ArrayList<Entry>();
+
+        String cmd = "SELECT * FROM users ORDER BY money DESC;";
+        try {
+            ResultSet rs = executeQuery(cmd);
+            while (rs.next()) {
+                Entry e = new Entry();
+                for (Field f : Field.values()) {
+                    e.setField(f, rs.getObject(f.getName(), f.getType()));
+                }
+                leaderboard.add(e);
+            }
+        } catch (SQLException err) {
+            err.printStackTrace();
+        }
+
+        return leaderboard;
     }
 
     public void updateValue(Entry e, Field f) {

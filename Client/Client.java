@@ -1,11 +1,8 @@
 import java.io.IOException;
 import java.net.Socket;
 
-import com.communication.Dataflow;
-import com.communication.Instruct;
-import com.communication.ReqResult;
-import com.communication.DataSender;
-
+//import custom.communication.*;
+//import custom.Util;
 
 public class Client extends DataSender {
     Socket socket;
@@ -19,7 +16,7 @@ public class Client extends DataSender {
 
     public void go() {
 
-        //server connection
+        // server connection
         try {
             init(new Socket("127.0.0.1", 5000));
         } catch (IOException e) {
@@ -30,9 +27,9 @@ public class Client extends DataSender {
             public void run() {
                 Dataflow data;
                 boolean cont = true;
-                while ((data = receiveData()) != null && cont) { //communication logic
+                while ((data = receiveData()) != null && cont) { // communication logic
                     System.out.println("New Data: " + data.getInstruct().toString());
-                    switch(data.getInstruct()) {
+                    switch (data.getInstruct()) {
                         case SUCCESSFUL_CONNECTION:
                             System.out.println("Successful connection with server!");
                             break;
@@ -41,6 +38,9 @@ public class Client extends DataSender {
                             break;
                         case AUTH_RESULT:
                             System.out.println("Recieved auth result");
+                            break;
+                        case LEADERBOARD_UPDATE:
+                            controller.updateLeaderboard(Util.convertObjectToList(data.getNext()));
                             break;
                         default:
                             System.out.println("Unhandled " + data.getInstruct().toString());
@@ -63,7 +63,7 @@ public class Client extends DataSender {
         if (response == null)
             return ReqResult.CONN_FAIL;
 
-        return (ReqResult)response.getNext();
+        return (ReqResult) response.getNext();
     }
 
     public ReqResult signupreq(String name, String username, String password, String confPassword) {
@@ -78,6 +78,6 @@ public class Client extends DataSender {
         if (response == null)
             return ReqResult.CONN_FAIL;
 
-        return (ReqResult)response.getNext();
+        return (ReqResult) response.getNext();
     }
 }

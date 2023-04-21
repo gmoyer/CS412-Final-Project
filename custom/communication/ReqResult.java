@@ -1,4 +1,3 @@
-package com.communication;
 public enum ReqResult {
     CONN_FAIL (false, "Request timed out. Please try again."),
     BAD_AUTH (false, "The username and password do not match."),

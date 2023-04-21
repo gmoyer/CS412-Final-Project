@@ -1,9 +1,6 @@
 import java.net.Socket;
 
-import com.communication.Dataflow;
-import com.communication.Instruct;
-import com.communication.ReqResult;
-import com.communication.DataSender;
+import custom.communication.*;
 
 //server side!!
 //maintains connection with client and account
@@ -52,6 +49,8 @@ public class SocketThread extends DataSender implements Runnable {
         commThread.start();
 
         sendData(new Dataflow(Instruct.SUCCESSFUL_CONNECTION));
+
+        sendLeaderboard();
     }
 
 
@@ -86,6 +85,12 @@ public class SocketThread extends DataSender implements Runnable {
             df.add(entry.getField(Field.MONEY));
         }
 
+        sendData(df);
+    }
+
+    public void sendLeaderboard() {
+        Dataflow df = new Dataflow(Instruct.LEADERBOARD_UPDATE);
+        df.add(accountManager.getLeaderboard());
         sendData(df);
     }
 

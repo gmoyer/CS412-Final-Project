@@ -1,4 +1,3 @@
-package com.communication;
 //server and client
 public enum Instruct { //short for Instruction
     SUCCESSFUL_CONNECTION,
@@ -6,5 +5,6 @@ public enum Instruct { //short for Instruction
     SIGNIN_ATTEMPT,
     SIGNUP_ATTEMPT,
     AUTH_RESULT,
+    LEADERBOARD_UPDATE,
     QUIT
 }
