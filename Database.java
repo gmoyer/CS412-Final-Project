@@ -117,8 +117,10 @@ public class Database {
     }
 
     public void updateValue(Entry e, Field f) {
-        String cmd = String.format("UPDATE users SET %s = %s WHERE id = %d;", f.getName(), f.SQL(e.getField(f).toString()), e.getField(Field.ID));
-        executeUpdate(cmd);
+        if (e.getField(f) != null && e.getField(Field.ID) != null) {
+            String cmd = String.format("UPDATE users SET %s = %s WHERE id = %d;", f.getName(), f.SQL(e.getField(f).toString()), e.getField(Field.ID));
+            executeUpdate(cmd);
+        }
     }
 
     public void deleteEntry(Entry e) {

@@ -25,7 +25,11 @@ public class Entry {
         }
     }
 
-    public Entry() {} //assumes every field will be populated
+    public Entry() {
+        //WARNING: assumes every field will be populated
+        this.database = Database.getInstance();
+        fields = new HashMap<String, Object>();
+    }
 
     private void create() { //new entry
         String username = (String)getField(Field.USERNAME);

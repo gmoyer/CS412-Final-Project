@@ -21,6 +21,12 @@ public class View {
         jFrame = new JFrame();
         jFrame.setSize(809, 500); //golden ratio :)
 
+        //init elements that need to be updated
+        leaderboard = new JLabel[3];
+        for (int i = 0; i < 3; i++) {
+            leaderboard[i] = new JLabel("");
+        }
+
         //on exit
         jFrame.addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent e) {
@@ -157,10 +163,7 @@ public class View {
         c.gridy = 0;
         container.add(leaderboardLabel, c);
 
-        leaderboard = new JLabel[3];
-
-        for (int i = 0; i < 2; i++) {
-            leaderboard[i] = new JLabel("");
+        for (int i = 0; i < 3; i++) {
             c.gridx = 0;
             c.gridy = i+1;
             container.add(leaderboard[i], c);
@@ -226,6 +229,7 @@ public class View {
 
     public void updateLeader(int index, String text) {
         if (index >= 0 && index <= 2) {
+            System.out.println("Setting leaderboard index " + index + " to " + text);
             leaderboard[index].setText(text);
         }
     }
