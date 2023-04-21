@@ -13,7 +13,7 @@ public class Database {
     private Database() {
         //create the SQL library if not created
         try {
-            conn = DriverManager.getConnection("jdbc:sqlite:serverdata.sqlite");
+            conn = DriverManager.getConnection("jdbc:sqlite:Database\\serverdata.sqlite");
             String cmd = "CREATE TABLE IF NOT EXISTS users (" +
                     "id INTEGER PRIMARY KEY," +
                     "name STRING," +

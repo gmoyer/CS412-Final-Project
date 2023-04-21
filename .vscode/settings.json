@@ -1,6 +1,6 @@
 {
     "java.project.referencedLibraries": [
         "lib/**/*.jar",
-        "c:\\Users\\Griffin Moyer\\Documents\\Western\\Software Dev 1\\sqlite-jdbc-3.41.0.0.jar"
+        "Database\\sqlite-jdbc-3.41.0.0.jar"
     ]
 }

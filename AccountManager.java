@@ -1,7 +1,5 @@
 import java.util.ArrayList;
 
-import custom.communication.ReqResult;
-
 //server and client side
 //communicates with SocketThread, Database, and Entry
 public class AccountManager {
