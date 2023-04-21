@@ -2,9 +2,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
-import custom.communication.ReqResult;
-import custom.Util;
-
 //client side
 public class Controller implements ActionListener {
     View view;
