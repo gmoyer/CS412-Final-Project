@@ -1,7 +1,5 @@
 import java.net.Socket;
 
-import custom.communication.*;
-
 //server side!!
 //maintains connection with client and account
 public class SocketThread extends DataSender implements Runnable {
