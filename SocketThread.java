@@ -7,10 +7,13 @@ public class SocketThread extends DataSender implements Runnable {
 
     AccountManager accountManager;
 
+    Game game;
+
     public SocketThread(Socket conn, Server s) {
         super(conn);
         server = s;
         accountManager = AccountManager.getInstance();
+        game = new Game();
     }
 
     @Override
@@ -32,13 +35,16 @@ public class SocketThread extends DataSender implements Runnable {
                             cont = false;
                             break;
                         case SIGNIN_ATTEMPT:
-                            signinAttempt((String)line.getNext(), (String)line.getNext());
+                            signinAttempt(line);
                             break;
                         case SIGNUP_ATTEMPT:
-                            signupAttempt((String)line.getNext(), (String)line.getNext(), (String)line.getNext(), (String)line.getNext());
+                            signupAttempt(line);
+                            break;
+                        case FLIP_REQUEST:
+                            flipCoin((int)line.getNext());
                             break;
                         default:
-                            System.out.println("Something unexpected happened");
+                            System.out.println("Unhandled request: " + line.getInstruct());
                             break;
                     }
                 }
@@ -52,13 +58,15 @@ public class SocketThread extends DataSender implements Runnable {
     }
 
 
-    public void signinAttempt(String username, String password) {
+    public void signinAttempt(Dataflow data) {
+        String username = (String)data.getNext();
+        String password = (String)data.getNext();
 
         ReqResult result = accountManager.loadAccount(username, password);
 
         Dataflow df = new Dataflow(Instruct.AUTH_RESULT);
 
-        df.add(result);
+        df.setResult(result);
 
         if (result.isSuccessful()) {
             Entry entry = accountManager.getActiveEntry();
@@ -69,13 +77,17 @@ public class SocketThread extends DataSender implements Runnable {
         sendData(df);
     }
 
-    public void signupAttempt(String name, String username, String password, String confPassword) {
+    public void signupAttempt(Dataflow data) {
+        String name = (String)data.getNext();
+        String username = (String)data.getNext();
+        String password = (String)data.getNext();
+        String confPassword = (String)data.getNext();
 
         ReqResult result = accountManager.createAccount(name, username, password, confPassword);
 
         Dataflow df = new Dataflow(Instruct.AUTH_RESULT);
 
-        df.add(result);
+        df.setResult(result);
 
         if (result.isSuccessful()) {
             Entry entry = accountManager.getActiveEntry();
@@ -92,4 +104,30 @@ public class SocketThread extends DataSender implements Runnable {
         sendData(df);
     }
 
+    public void flipCoin(int betAmount) {
+        Entry entry = accountManager.getActiveEntry();
+
+        int money = (int)entry.getField(Field.MONEY);
+
+        Dataflow df = new Dataflow(Instruct.FLIP_RESULT);
+
+        if (betAmount > money) {
+            df.setResult(ReqResult.NOT_ENOUGH_MONEY);
+        } else {
+            df.setResult(ReqResult.SUCCESS);
+            boolean outcome = game.flipCoin();
+
+            if (outcome) { //win coin toss
+                money += betAmount;
+            } else { //lose coin toss
+                money -= betAmount;
+            }
+            entry.setField(Field.MONEY, money);
+
+            df.add(outcome);
+            df.add(money);
+        }
+
+        sendData(df);
+    }
 }

@@ -1,5 +1,6 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.List;
 
 //client side
@@ -8,11 +9,20 @@ public class Controller implements ActionListener {
     Client client;
     private static Controller controller;
 
+    //client data
+    String username;
+    String name;
+    int money;
+    int betAmount;
+
     public static void main(String argv[]) {
         getInstance().go();
     }
 
     private Controller() {
+        betAmount = 0;
+        money = 0;
+
         view = new View(this);
         client = new Client(this);
     }
@@ -24,6 +34,7 @@ public class Controller implements ActionListener {
     }
 
     public void go() {
+
         view.navSignin();
 
         //view.navMain();
@@ -33,7 +44,7 @@ public class Controller implements ActionListener {
         System.exit(0);
     }
 
-
+    
     @Override
     public void actionPerformed(ActionEvent e) {
         Button clickedButton = (Button)e.getSource();
@@ -47,23 +58,40 @@ public class Controller implements ActionListener {
                 break;
             case BACK_SIGN_IN: view.navSignin();
                 break;
+            case ADD_TO_BET: updateBetAmount(5);
+                break;
+            case REMOVE_FROM_BET: updateBetAmount(-5);
+                break;
+            case CHOOSE_HEADS: chooseSide(true);
+                break;
+            case CHOOSE_TAILS: chooseSide(false);
+                break;
+            case FLIP: flipCoin();
+                break;
             default:
                 System.out.println("Unhandled response " + clickedButton.getID().toString());
         }
     }
 
     public void signin(Button button) {
-        String username = button.getTextField(TextFieldID.USERNAME);
+        username = button.getTextField(TextFieldID.USERNAME);
         String password = button.getTextField(TextFieldID.PASSWORD);
 
         String hashword = Util.sha256(password);
 
-        ReqResult result = client.signinreq(username, hashword);
+        ArrayList<Object> req = new ArrayList<Object>();
 
+        req.add(username);
+        req.add(hashword);
 
-        if (!result.isSuccessful()) {
-            view.setError(result.getMessage());
+        Dataflow result = client.serverRequest(Instruct.SIGNIN_ATTEMPT, Instruct.AUTH_RESULT, req);
+
+        if (!result.getResult().isSuccessful()) {
+            view.setError(result.getResult().getMessage());
         } else {
+            name = (String)result.getNext();
+            money = (int)result.getNext();
+            view.updateMoney(money);
             view.navMain();
         }
     }
@@ -77,12 +105,23 @@ public class Controller implements ActionListener {
         String hashword = Util.sha256(password);
         String confHashword = Util.sha256(confPassword);
 
-        ReqResult result = client.signupreq(name, username, hashword, confHashword);
+        ArrayList<Object> request = new ArrayList<Object>();
 
-        if (!result.isSuccessful())
-            view.setError(result.getMessage());
-        else
+        request.add(name);
+        request.add(username);
+        request.add(hashword);
+        request.add(confHashword);
+
+        Dataflow result = client.serverRequest(Instruct.SIGNUP_ATTEMPT, Instruct.AUTH_RESULT, request);
+
+        if (!result.getResult().isSuccessful())
+            view.setError(result.getResult().getMessage());
+        else {
+            this.name = (String)result.getNext();
+            money = (int)result.getNext();
+            view.updateMoney(money);
             view.navMain();
+        }
     }
 
     public void updateLeaderboard(List<?> list) {
@@ -92,6 +131,36 @@ public class Controller implements ActionListener {
 
         for (int i = 0; i < leaderboardSize; i++) {
             view.updateLeader(i, (String)list.get(i));
+        }
+    }
+
+    public void updateBetAmount(int change) {
+        if (betAmount + change <= 0 || betAmount + change > money) {
+            return;
+        }
+
+        betAmount += change;
+        view.updateBetAmount(betAmount);
+    }
+
+    public void chooseSide(boolean side) { //effectively does nothing
+        //true = heads, false = tails
+    }
+
+    public void flipCoin() {
+        ArrayList<Object> request = new ArrayList<Object>();
+
+        request.add(betAmount);
+
+        Dataflow response = client.serverRequest(Instruct.FLIP_REQUEST, Instruct.FLIP_RESULT, request);
+
+        if (response.getResult().isSuccessful()) {
+            boolean outcome = (boolean)response.getNext();
+            money = (int)response.getNext();
+            view.updateMoney(money);
+        } else {
+            System.out.println("No success");
+            view.setError(response.getResult().getMessage());
         }
     }
 }

@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
 
 //import custom.communication.*;
 //import custom.Util;
@@ -52,18 +53,37 @@ public class Client extends DataSender {
         });
         commThread.start();
     }
+    public Dataflow serverRequest(Instruct req, Instruct resp, ArrayList<Object> data) {
+        Dataflow df = new Dataflow(req);
 
+        for (Object d : data) {
+            df.add(d);
+        }
+
+        Dataflow response = query(df, resp);
+
+        if (response == null) {
+            response = new Dataflow(resp);
+            response.setResult(ReqResult.CONN_FAIL);
+        }
+
+        return response;
+    }
+
+
+
+    /*
     public ReqResult signinreq(String username, String password) {
         Dataflow df = new Dataflow(Instruct.SIGNIN_ATTEMPT);
         df.add(username);
         df.add(password);
 
-        Dataflow response = query(df, Instruct.AUTH_RESULT);
+        Dataflow lastRequest = query(df, Instruct.AUTH_RESULT);
 
-        if (response == null)
+        if (lastRequest == null)
             return ReqResult.CONN_FAIL;
 
-        return (ReqResult) response.getNext();
+        return (ReqResult) lastRequest.getNext();
     }
 
     public ReqResult signupreq(String name, String username, String password, String confPassword) {
@@ -73,11 +93,16 @@ public class Client extends DataSender {
         df.add(password);
         df.add(confPassword);
 
-        Dataflow response = query(df, Instruct.AUTH_RESULT);
+        lastRequest = query(df, Instruct.AUTH_RESULT);
 
-        if (response == null)
+        if (lastRequest == null)
             return ReqResult.CONN_FAIL;
 
-        return (ReqResult) response.getNext();
+        return (ReqResult) lastRequest.getNext();
     }
+
+    public Object requestNext() {
+        return lastRequest.getNext();
+    }
+    */
 }

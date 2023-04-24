@@ -6,5 +6,7 @@ public enum Instruct { //short for Instruction
     SIGNUP_ATTEMPT,
     AUTH_RESULT,
     LEADERBOARD_UPDATE,
+    FLIP_REQUEST,
+    FLIP_RESULT,
     QUIT
 }

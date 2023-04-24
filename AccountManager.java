@@ -30,7 +30,7 @@ public class AccountManager {
         entry.setField(Field.NAME, name);
         entry.setField(Field.PASSWORD, password);
         
-        return ReqResult.GOOD_AUTH;
+        return ReqResult.SUCCESS;
     }
 
     public ReqResult loadAccount(String username, String password) {
@@ -44,7 +44,7 @@ public class AccountManager {
         //System.out.println("Comparing " + entry.getField(Field.PASSWORD) + " and " + password);
 
         if (entry.getField(Field.PASSWORD).equals(password)) {
-            return ReqResult.GOOD_AUTH;
+            return ReqResult.SUCCESS;
         } else {
             return ReqResult.BAD_AUTH;
         }

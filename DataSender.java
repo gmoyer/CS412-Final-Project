@@ -52,7 +52,7 @@ public abstract class DataSender {
         }
     }
 
-    //must be run through a thread
+    //WARNING: must be run through a thread
     protected Dataflow receiveData() {
         if (initialized) {
             try {

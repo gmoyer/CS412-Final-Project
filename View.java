@@ -15,6 +15,7 @@ public class View {
     JLabel betAmount;
     JLabel coinImage;
     JLabel[] leaderboard;
+    JLabel currentMoney;
 
     public View(Controller c) {
         controller = c;
@@ -26,6 +27,7 @@ public class View {
         for (int i = 0; i < 3; i++) {
             leaderboard[i] = new JLabel("");
         }
+        currentMoney = new JLabel();
 
         //on exit
         jFrame.addWindowListener(new java.awt.event.WindowAdapter() {
@@ -206,17 +208,21 @@ public class View {
         c.gridy = 9;
         container.add(flip, c);
 
-        betAmount = new JLabel("Current bet: $00");
+
+        //all centered, 3 wide elements
+        betAmount = new JLabel("Current bet: $0");
         c.gridx = 3;
         c.gridy = 7;
         c.gridwidth = 3;
         container.add(betAmount, c);
 
-        //images
+        c.gridy = 5;
+        container.add(currentMoney, c);
+
+        //image
         try {
             BufferedImage headsCoin = ImageIO.read(new File("images/Heads.png"));
             coinImage = new JLabel(new ImageIcon(headsCoin.getScaledInstance(100, 100, Image.SCALE_FAST)));
-            c.gridx = 3;
             c.gridy = 6;
             container.add(coinImage, c);
         } catch (IOException e) {
@@ -229,8 +235,16 @@ public class View {
 
     public void updateLeader(int index, String text) {
         if (index >= 0 && index <= 2) {
-            System.out.println("Setting leaderboard index " + index + " to " + text);
             leaderboard[index].setText(text);
         }
+    }
+
+    public void updateMoney(int amount) {
+        currentMoney.setText("$" + amount);
+    }
+
+    public void updateBetAmount(int amount) {
+        System.out.println("Setting bet to " + amount);
+        betAmount.setText("Current bet: $" + amount);
     }
 }
