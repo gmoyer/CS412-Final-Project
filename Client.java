@@ -44,7 +44,7 @@ public class Client extends DataSender {
                             controller.updateLeaderboard(Util.convertObjectToList(data.getNext()));
                             break;
                         default:
-                            System.out.println("Unhandled " + data.getInstruct().toString());
+                            //System.out.println("Unhandled " + data.getInstruct().toString());
                             break;
                     }
                 }

@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 public class Server {
 
     ServerSocket serverSocket;
-    ArrayList<Thread> connections;
+    ArrayList<Connection> connections;
     Thread acceptConnections;
     Database database;
     public static void main(String args[]) {
@@ -18,7 +18,7 @@ public class Server {
         try {
 
             serverSocket = new ServerSocket(5000);
-            connections = new ArrayList<Thread>();
+            connections = new ArrayList<Connection>();
             database = Database.getInstance();
 
             Thread acceptConnections = new Thread(new Runnable() {
@@ -50,14 +50,23 @@ public class Server {
         System.out.println("SERVER: Recieved client");
         
         //thread the connnection
-        Thread thread = new Thread(new SocketThread(conn, this));
-        connections.add(thread);
+        SocketThread socketThread = new SocketThread(conn, this);
+        Thread thread = new Thread(socketThread);
+
+        Connection connection = new Connection(socketThread, thread);
+        connections.add(connection);
 
         thread.start();
     }
 
     public void checkConnectionsStatus() {
         //System.out.println(connections.size());
-        connections.removeIf(conn -> !conn.isAlive());
+        connections.removeIf(conn -> !conn.getThread().isAlive());
+    }
+
+    public void updateAllLeaderboards() {
+        for (Connection connection : connections) {
+            connection.getSocketThread().sendLeaderboard();
+        }
     }
 }

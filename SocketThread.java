@@ -1,4 +1,5 @@
 import java.net.Socket;
+import java.util.ArrayList;
 
 //server side!!
 //maintains connection with client and account
@@ -122,7 +123,11 @@ public class SocketThread extends DataSender implements Runnable {
             } else { //lose coin toss
                 money -= betAmount;
             }
+            accountManager.getLeaderboard(true); //to save output 
             entry.setField(Field.MONEY, money);
+            if (accountManager.leaderboardUpdated()) {
+                server.updateAllLeaderboards();
+            }
 
             df.add(outcome);
             df.add(money);

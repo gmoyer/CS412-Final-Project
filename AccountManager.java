@@ -6,6 +6,7 @@ public class AccountManager {
     private Database database;
     private Entry entry; //active account entry
     private static AccountManager am;
+    private ArrayList<String> leaderboard;
 
     private AccountManager() {
         database = Database.getInstance();
@@ -54,7 +55,7 @@ public class AccountManager {
         return entry;
     }
 
-    public ArrayList<String> getLeaderboard() {
+    public ArrayList<String> getLeaderboard(boolean saveOutput) {
         ArrayList<String> leaderboardText = new ArrayList<String>();
 
         ArrayList<Entry> entries = database.getAllEntries();
@@ -68,7 +69,23 @@ public class AccountManager {
             String txt = "$" + e.getField(Field.MONEY) + " - " + e.getField(Field.USERNAME);
             leaderboardText.add(txt);
         }
-
+        if (saveOutput)
+            leaderboard = leaderboardText;
         return leaderboardText;
+    }
+    public ArrayList<String> getLeaderboard() {
+        return getLeaderboard(false);
+    }
+
+    public boolean leaderboardUpdated() {
+        ArrayList<String> postLeaderboard = getLeaderboard();
+        if (leaderboard.size() != postLeaderboard.size()) {
+            return true;
+        }
+        for (int i = 0; i < leaderboard.size(); i++) {
+            if (!leaderboard.get(i).equals(postLeaderboard.get(i)))
+                return true;
+        }
+        return false;
     }
 }

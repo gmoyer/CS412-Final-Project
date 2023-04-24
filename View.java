@@ -244,7 +244,7 @@ public class View {
     }
 
     public void updateBetAmount(int amount) {
-        System.out.println("Setting bet to " + amount);
+        //System.out.println("Setting bet to " + amount);
         betAmount.setText("Current bet: $" + amount);
     }
 }
