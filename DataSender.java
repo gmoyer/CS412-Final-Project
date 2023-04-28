@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.HashMap;
 
 public abstract class DataSender {
@@ -61,7 +62,11 @@ public abstract class DataSender {
                     dataReceived.put(df.getInstruct(), df);
                 }
                 return df;
-            } catch (IOException e) {
+            } catch (SocketException e) {
+                System.out.println("Connection lost");
+                return null;
+            } 
+            catch (IOException e) {
                 e.printStackTrace();
                 return null;
             } catch (ClassNotFoundException e) {
@@ -75,20 +80,24 @@ public abstract class DataSender {
     }
 
     protected Dataflow query(Dataflow df, Instruct i) {
+        if (initialized) {
+            dataReceived.put(i, null);
+            sendData(df);
 
-        dataReceived.put(i, null);
-        sendData(df);
+            long sentTimeStamp = System.currentTimeMillis();
 
-        long sentTimeStamp = System.currentTimeMillis();
-
-        Dataflow receivedData = null;
-        while (receivedData == null) {
-            synchronized(mutex) {
-                receivedData = dataReceived.get(i);
+            Dataflow receivedData = null;
+            while (receivedData == null) {
+                synchronized(mutex) {
+                    receivedData = dataReceived.get(i);
+                }
+                if (System.currentTimeMillis() > sentTimeStamp + allowedDelay)
+                    return null;
             }
-            if (System.currentTimeMillis() > sentTimeStamp + allowedDelay)
-                return null;
-        }
-        return receivedData;
+            return receivedData;
+        } else {
+            System.out.println("Error: datasender not initialized");
+            return null;
+        } 
     }
 }

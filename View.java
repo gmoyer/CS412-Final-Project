@@ -154,6 +154,8 @@ public class View {
     }
 
     public void navMain() {
+        setError("");
+        
         JPanel container = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
 
@@ -218,6 +220,9 @@ public class View {
 
         c.gridy = 5;
         container.add(currentMoney, c);
+
+        c.gridy = 4;
+        container.add(errorLabel, c);
 
         //image
         try {

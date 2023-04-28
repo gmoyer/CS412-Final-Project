@@ -2,6 +2,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 //client side
 public class Controller implements ActionListener {
@@ -11,6 +12,7 @@ public class Controller implements ActionListener {
 
     //client data
     String username;
+    String hashword;
     String name;
     int money;
     int betAmount;
@@ -34,6 +36,12 @@ public class Controller implements ActionListener {
     }
 
     public void go() {
+        username = "";
+        hashword = "";
+        name = "";
+        money = 0;
+        betAmount = 0;
+
 
         view.navSignin();
 
@@ -42,6 +50,20 @@ public class Controller implements ActionListener {
 
     public void close() {
         System.exit(0);
+    }
+
+    public void connectionLost() {
+        view.setError("Connection lost. Attempting to reconnect...");
+
+        try {
+            TimeUnit.SECONDS.sleep(5);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        client = new Client(this);
+
+        signin();
     }
 
     
@@ -77,8 +99,12 @@ public class Controller implements ActionListener {
         username = button.getTextField(TextFieldID.USERNAME);
         String password = button.getTextField(TextFieldID.PASSWORD);
 
-        String hashword = Util.sha256(password);
+        hashword = Util.sha256(password);
 
+        signin();
+    }
+
+    public void signin() {
         ArrayList<Object> req = new ArrayList<Object>();
 
         req.add(username);
@@ -102,7 +128,7 @@ public class Controller implements ActionListener {
         String password = button.getTextField(TextFieldID.PASSWORD);
         String confPassword = button.getTextField(TextFieldID.CONFIRM_PASSWORD);
 
-        String hashword = Util.sha256(password);
+        hashword = Util.sha256(password);
         String confHashword = Util.sha256(confPassword);
 
         ArrayList<Object> request = new ArrayList<Object>();

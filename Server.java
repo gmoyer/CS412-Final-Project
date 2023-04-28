@@ -56,12 +56,26 @@ public class Server {
         Connection connection = new Connection(socketThread, thread);
         connections.add(connection);
 
-        thread.start();
+        connection.getThread().start();
     }
 
     public void checkConnectionsStatus() {
-        //System.out.println(connections.size());
+        //Find connections to remove
+
         connections.removeIf(conn -> !conn.getThread().isAlive());
+        /*
+        ArrayList<Connection> toRemove = new ArrayList<Connection>();
+        for (Connection conn : connections) {
+            System.out.println(conn.getThread().isAlive());
+            if (!conn.getThread().isAlive())
+                toRemove.add(conn);
+        }
+
+        //remove them
+        for (Connection conn : toRemove) {
+            connections.remove(conn);
+        }
+        */
     }
 
     public void updateAllLeaderboards() {

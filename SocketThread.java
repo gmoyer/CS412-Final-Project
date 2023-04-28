@@ -1,5 +1,4 @@
 import java.net.Socket;
-import java.util.ArrayList;
 
 //server side!!
 //maintains connection with client and account
@@ -56,6 +55,12 @@ public class SocketThread extends DataSender implements Runnable {
         sendData(new Dataflow(Instruct.SUCCESSFUL_CONNECTION));
 
         sendLeaderboard();
+
+        try {
+            commThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -112,7 +117,7 @@ public class SocketThread extends DataSender implements Runnable {
 
         Dataflow df = new Dataflow(Instruct.FLIP_RESULT);
 
-        if (betAmount > money) {
+        if (betAmount > money || betAmount <= 0) {
             df.setResult(ReqResult.NOT_ENOUGH_MONEY);
         } else {
             df.setResult(ReqResult.SUCCESS);

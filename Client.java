@@ -9,9 +9,12 @@ public class Client extends DataSender {
     Socket socket;
     Controller controller;
 
+    int waitUntilNextConnectionAttempt;
+
     public Client(Controller c) {
         super();
         controller = c;
+        waitUntilNextConnectionAttempt = 1;
         go();
     }
 
@@ -21,7 +24,7 @@ public class Client extends DataSender {
         try {
             init(new Socket("127.0.0.1", 5000));
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Connection refused");
         }
         commThread = new Thread(new Runnable() {
             @Override
@@ -48,7 +51,7 @@ public class Client extends DataSender {
                             break;
                     }
                 }
-                System.out.println("Quitting...");
+                controller.connectionLost();
             }
         });
         commThread.start();
