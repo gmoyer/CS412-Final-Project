@@ -90,6 +90,8 @@ public class Controller implements ActionListener {
                 break;
             case FLIP: flipCoin();
                 break;
+            case SIGN_OUT: signout();
+                break;
             default:
                 System.out.println("Unhandled response " + clickedButton.getID().toString());
         }
@@ -124,7 +126,7 @@ public class Controller implements ActionListener {
 
     public void createAccount(Button button) {
         String name = button.getTextField(TextFieldID.NAME);
-        String username = button.getTextField(TextFieldID.USERNAME);
+        username = button.getTextField(TextFieldID.USERNAME);
         String password = button.getTextField(TextFieldID.PASSWORD);
         String confPassword = button.getTextField(TextFieldID.CONFIRM_PASSWORD);
 
@@ -188,5 +190,13 @@ public class Controller implements ActionListener {
             System.out.println("No success");
             view.setError(response.getResult().getMessage());
         }
+    }
+
+
+    public void signout() {
+        Dataflow df = new Dataflow(Instruct.SIGN_OUT);
+        client.sendData(df);
+
+        view.navSignin();
     }
 }

@@ -5,6 +5,10 @@ public enum ReqResult {
     BAD_AUTH (false, "The username and password do not match."),
     PASS_DO_NOT_MATCH(false, "Passwords must match."),
     NON_UNIQUE_USERNAME(false, "Username must be unique."),
+    BAD_CHARACTERS (false, "Invalid characters. Please only use alphanumeric characters."),
+    LONG_USERNAME (false, "Max username: 10 characters."),
+    INCOMPLETE (false, "Please fill out all fields"),
+    LONG_NAME (false, "Max name: 15 characters."),
     BAD_REQUEST(false, "The request is invalid."), //used for when a client sends data it should not be sending
     ALREADY_ACTIVE(false, "A user is already signed into this account."),
     NOT_ENOUGH_MONEY(false, "Not enough money to make the bet.");

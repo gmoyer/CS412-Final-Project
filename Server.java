@@ -16,7 +16,6 @@ public class Server {
 
     public void go() {
         try {
-
             serverSocket = new ServerSocket(5000);
             connections = new ArrayList<Connection>();
             database = Database.getInstance();

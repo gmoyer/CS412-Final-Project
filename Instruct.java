@@ -8,5 +8,6 @@ public enum Instruct { //short for Instruction
     LEADERBOARD_UPDATE,
     FLIP_REQUEST,
     FLIP_RESULT,
+    SIGN_OUT,
     QUIT
 }

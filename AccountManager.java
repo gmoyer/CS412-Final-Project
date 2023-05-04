@@ -5,20 +5,19 @@ import java.util.ArrayList;
 public class AccountManager {
     private Database database;
     private Entry entry; //active account entry
-    private static AccountManager am;
     private ArrayList<String> leaderboard;
 
-    private AccountManager() {
-        database = Database.getInstance();
-    }
+    private final String allowedCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-";
 
-    public static AccountManager getInstance() {
-        if (am == null)
-            am = new AccountManager();
-        return am;
+    public AccountManager() {
+        database = Database.getInstance();
+        entry = null;
     }
 
     public ReqResult createAccount(String name, String username, String password, String confirmPassword) {
+
+        if (username.length() == 0 || name.length() == 0 || password.equals(Util.sha256("")))
+            return ReqResult.INCOMPLETE;
 
         if (!password.equals(confirmPassword)) {
             return ReqResult.PASS_DO_NOT_MATCH;
@@ -26,6 +25,19 @@ public class AccountManager {
         if (database.getID(username) != -1) {
             return ReqResult.NON_UNIQUE_USERNAME;
         }
+
+        if (username.length() > 10) {
+            return ReqResult.LONG_USERNAME;
+        }
+        if (name.length() > 15) {
+            return ReqResult.LONG_NAME;
+        }
+
+        if (!(validString(name) && validString(username) && validString(password) && validString(confirmPassword)) )
+            return ReqResult.BAD_CHARACTERS;
+        
+
+
 
         entry = new Entry(username, true);
         entry.setField(Field.NAME, name);
@@ -36,6 +48,9 @@ public class AccountManager {
     }
 
     public ReqResult loadAccount(String username, String password) {
+
+        if (username.length() == 0 || password.equals(Util.sha256("")))
+            return ReqResult.INCOMPLETE;
 
         if (database.getID(username) == -1) {
             return ReqResult.BAD_AUTH;
@@ -55,8 +70,21 @@ public class AccountManager {
         return ReqResult.SUCCESS;
     }
 
+    public boolean validString(String str) {
+        if (str.length() > 100)
+            return false;
+        for (int i = 0; i < str.length(); i++) {
+            if (allowedCharacters.indexOf(str.charAt(i)) == -1)
+                return false;
+        }
+        return true;
+    }
+
     public Entry getActiveEntry() {
         return entry;
+    }
+    public boolean signedIn() {
+        return entry != null;
     }
 
     public ArrayList<String> getLeaderboard(boolean saveOutput) {
@@ -95,6 +123,8 @@ public class AccountManager {
 
 
     public void signout() {
-        entry.setField(Field.ACTIVE, false);
+        if (entry != null)
+            entry.setField(Field.ACTIVE, false);
+        entry = null;
     }
 }

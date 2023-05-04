@@ -12,7 +12,7 @@ public class SocketThread extends DataSender implements Runnable {
     public SocketThread(Socket conn, Server s) {
         super(conn);
         server = s;
-        accountManager = AccountManager.getInstance();
+        accountManager = new AccountManager();
         game = new Game();
     }
 
@@ -42,6 +42,9 @@ public class SocketThread extends DataSender implements Runnable {
                             break;
                         case FLIP_REQUEST:
                             flipCoin((int)line.getNext());
+                            break;
+                        case SIGN_OUT:
+                            accountManager.signout();
                             break;
                         default:
                             System.out.println("Unhandled request: " + line.getInstruct());
@@ -114,6 +117,10 @@ public class SocketThread extends DataSender implements Runnable {
     }
 
     public void flipCoin(int betAmount) {
+        if (!accountManager.signedIn())
+            return;
+
+        
         Entry entry = accountManager.getActiveEntry();
 
         int money = (int)entry.getField(Field.MONEY);
