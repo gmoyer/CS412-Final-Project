@@ -30,7 +30,8 @@ public class AccountManager {
         entry = new Entry(username, true);
         entry.setField(Field.NAME, name);
         entry.setField(Field.PASSWORD, password);
-        
+
+        entry.setField(Field.ACTIVE, 1);
         return ReqResult.SUCCESS;
     }
 
@@ -44,11 +45,14 @@ public class AccountManager {
 
         //System.out.println("Comparing " + entry.getField(Field.PASSWORD) + " and " + password);
 
-        if (entry.getField(Field.PASSWORD).equals(password)) {
-            return ReqResult.SUCCESS;
-        } else {
+        if (!entry.getField(Field.PASSWORD).equals(password))
             return ReqResult.BAD_AUTH;
-        }
+
+        if ((boolean)entry.getField(Field.ACTIVE))
+            return ReqResult.ALREADY_ACTIVE;
+
+        entry.setField(Field.ACTIVE, 1);
+        return ReqResult.SUCCESS;
     }
 
     public Entry getActiveEntry() {
@@ -87,5 +91,10 @@ public class AccountManager {
                 return true;
         }
         return false;
+    }
+
+
+    public void signout() {
+        entry.setField(Field.ACTIVE, false);
     }
 }

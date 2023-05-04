@@ -21,6 +21,8 @@ public class Server {
             connections = new ArrayList<Connection>();
             database = Database.getInstance();
 
+            database.signoutAll();
+
             Thread acceptConnections = new Thread(new Runnable() {
                 public void run() {
                     while (true) {

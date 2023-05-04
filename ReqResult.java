@@ -1,12 +1,13 @@
 public enum ReqResult {
-    DEFAULT (false, "Error, please report"),
+    SUCCESS (true),
+    DEFAULT (false, "Unexpected error. Please report"),
     CONN_FAIL (false, "Request timed out. Please try again."),
     BAD_AUTH (false, "The username and password do not match."),
-    SUCCESS (true),
     PASS_DO_NOT_MATCH(false, "Passwords must match."),
     NON_UNIQUE_USERNAME(false, "Username must be unique."),
-    BAD_REQUEST(false, "The request is invalid"), //used for when a client sends data it should not be sending
-    NOT_ENOUGH_MONEY(false, "Not enough money to make the bet");
+    BAD_REQUEST(false, "The request is invalid."), //used for when a client sends data it should not be sending
+    ALREADY_ACTIVE(false, "A user is already signed into this account."),
+    NOT_ENOUGH_MONEY(false, "Not enough money to make the bet.");
 
     private final boolean success;
     private final String reqMessage;

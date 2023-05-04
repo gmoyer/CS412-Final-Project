@@ -61,6 +61,9 @@ public class SocketThread extends DataSender implements Runnable {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+        //closing down actions
+        accountManager.signout();
     }
 
 
