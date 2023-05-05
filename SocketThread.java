@@ -124,14 +124,17 @@ public class SocketThread extends DataSender implements Runnable {
         Entry entry = accountManager.getActiveEntry();
 
         int money = (int)entry.getField(Field.MONEY);
+        int flipCount = (int)entry.getField(Field.FLIPCOUNT);
 
         Dataflow df = new Dataflow(Instruct.FLIP_RESULT);
 
-        if (betAmount > money || betAmount <= 0) {
+        if (betAmount > money || betAmount < 0) {
             df.setResult(ReqResult.NOT_ENOUGH_MONEY);
         } else {
             df.setResult(ReqResult.SUCCESS);
-            boolean outcome = game.flipCoin();
+            boolean outcome = game.flipCoin(flipCount);
+
+            entry.setField(Field.FLIPCOUNT, flipCount+1);
 
             if (outcome) { //win coin toss
                 money += betAmount;

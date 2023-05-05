@@ -32,7 +32,7 @@ public class Client extends DataSender {
                 Dataflow data;
                 boolean cont = true;
                 while ((data = receiveData()) != null && cont) { // communication logic
-                    System.out.println("New Data: " + data.getInstruct().toString());
+                    //System.out.println("New Data: " + data.getInstruct().toString());
                     switch (data.getInstruct()) {
                         case SUCCESSFUL_CONNECTION:
                             System.out.println("Successful connection with server!");

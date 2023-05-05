@@ -2,7 +2,6 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
 
 public class Server {
 
@@ -40,9 +39,9 @@ public class Server {
 
             while (true) {
                 checkConnectionsStatus();
-                TimeUnit.SECONDS.sleep(1);
+                Util.sleep(1);
             }
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

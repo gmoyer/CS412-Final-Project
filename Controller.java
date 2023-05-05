@@ -1,14 +1,17 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 //client side
-public class Controller implements ActionListener {
+public class Controller implements ActionListener, KeyListener {
     View view;
     Client client;
     private static Controller controller;
+
+    boolean locked;
 
     //client data
     String username;
@@ -16,15 +19,18 @@ public class Controller implements ActionListener {
     String name;
     int money;
     int betAmount;
+    boolean coinSide;
+
+
+    Dataflow response;
+    final int flipTime = 1000;
 
     public static void main(String argv[]) {
         getInstance().go();
     }
 
     private Controller() {
-        betAmount = 0;
-        money = 0;
-
+        locked = false;
         view = new View(this);
         client = new Client(this);
     }
@@ -40,8 +46,7 @@ public class Controller implements ActionListener {
         hashword = "";
         name = "";
         money = 0;
-        betAmount = 0;
-
+        betAmount = 5;
 
         view.navSignin();
 
@@ -55,11 +60,7 @@ public class Controller implements ActionListener {
     public void connectionLost() {
         view.setError("Connection lost. Attempting to reconnect...");
 
-        try {
-            TimeUnit.SECONDS.sleep(5);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        Util.sleep(5);
 
         client = new Client(this);
 
@@ -69,37 +70,61 @@ public class Controller implements ActionListener {
     
     @Override
     public void actionPerformed(ActionEvent e) {
-        Button clickedButton = (Button)e.getSource();
+        handleAction((Element)e.getSource());
+    }
+    @Override
+    public void keyTyped(KeyEvent e) {
+        handleAction((Element)e.getSource());
+    }
+    @Override
+    public void keyPressed(KeyEvent e) {}
+    @Override
+    public void keyReleased(KeyEvent e) {}
+    
 
-        switch (clickedButton.getID()) {
-            case SIGN_IN: signin(clickedButton);
-                break;
-            case SIGN_UP: view.navSignup();
-                break;
-            case CREATE_ACCOUNT: createAccount(clickedButton);
-                break;
-            case BACK_SIGN_IN: view.navSignin();
-                break;
-            case ADD_TO_BET: updateBetAmount(5);
-                break;
-            case REMOVE_FROM_BET: updateBetAmount(-5);
-                break;
-            case CHOOSE_HEADS: chooseSide(true);
-                break;
-            case CHOOSE_TAILS: chooseSide(false);
-                break;
-            case FLIP: flipCoin();
-                break;
-            case SIGN_OUT: signout();
-                break;
-            default:
-                System.out.println("Unhandled response " + clickedButton.getID().toString());
-        }
+    public void handleAction(Element clickedElement) {
+        if (locked)
+            return;
+        locked = true;
+
+        Thread buttonHandler = new Thread(new Runnable() {
+            public void run() {
+                switch (clickedElement.getID()) {
+                    case SIGN_IN: signin((Button)clickedElement);
+                        break;
+                    case SIGN_UP: view.navSignup();
+                        break;
+                    case CREATE_ACCOUNT: createAccount((Button)clickedElement);
+                        break;
+                    case BACK_SIGN_IN: view.navSignin();
+                        break;
+                    case ADD_TO_BET: setBetAmount(betAmount+5);
+                        break;
+                    case REMOVE_FROM_BET: setBetAmount(betAmount-5);
+                        break;
+                    case CHOOSE_HEADS: chooseSide(true);
+                        break;
+                    case CHOOSE_TAILS: chooseSide(false);
+                        break;
+                    case FLIP: flipCoin();
+                        break;
+                    case SIGN_OUT: signout();
+                        break;
+                    case BET_AMOUNT: setBetAmount((TextField)clickedElement);
+                        break;
+                    default:
+                        System.out.println("Unhandled response " + clickedElement.getID().toString());
+                }
+                locked = false;
+            }
+        });
+
+        buttonHandler.start();
     }
 
     public void signin(Button button) {
-        username = button.getTextField(TextFieldID.USERNAME);
-        String password = button.getTextField(TextFieldID.PASSWORD);
+        username = button.getTextField(ElementID.USERNAME);
+        String password = button.getTextField(ElementID.PASSWORD);
 
         hashword = Util.sha256(password);
 
@@ -120,15 +145,16 @@ public class Controller implements ActionListener {
             name = (String)result.getNext();
             money = (int)result.getNext();
             view.updateMoney(money);
+            betAmount = 5;
             view.navMain();
         }
     }
 
     public void createAccount(Button button) {
-        String name = button.getTextField(TextFieldID.NAME);
-        username = button.getTextField(TextFieldID.USERNAME);
-        String password = button.getTextField(TextFieldID.PASSWORD);
-        String confPassword = button.getTextField(TextFieldID.CONFIRM_PASSWORD);
+        String name = button.getTextField(ElementID.NAME);
+        username = button.getTextField(ElementID.USERNAME);
+        String password = button.getTextField(ElementID.PASSWORD);
+        String confPassword = button.getTextField(ElementID.CONFIRM_PASSWORD);
 
         hashword = Util.sha256(password);
         String confHashword = Util.sha256(confPassword);
@@ -148,6 +174,7 @@ public class Controller implements ActionListener {
             this.name = (String)result.getNext();
             money = (int)result.getNext();
             view.updateMoney(money);
+            betAmount = 5;
             view.navMain();
         }
     }
@@ -162,17 +189,42 @@ public class Controller implements ActionListener {
         }
     }
 
-    public void updateBetAmount(int change) {
-        if (betAmount + change <= 0 || betAmount + change > money) {
+    public void setBetAmount(TextField tf) {
+        String input = tf.getText();
+
+        if (Util.validNumber(input)) {
+            if (input.length()==0)
+                return;
+            int num = Integer.parseInt(input);
+            if (num > money) {
+                setBetAmount(money);
+            } else {
+                setBetAmount(num, false);
+            }
+        } else {
+            setBetAmount(betAmount);
+        }
+    }
+    public void setBetAmount(int change) {
+        setBetAmount(change, true);
+    }
+    public void setBetAmount(int change, boolean updateView) {
+        if (change < 0 || change > money) {
             return;
         }
 
-        betAmount += change;
-        view.updateBetAmount(betAmount);
+        betAmount = change;
+        if (updateView)
+            view.updateBetAmount(betAmount);
     }
 
-    public void chooseSide(boolean side) { //effectively does nothing
-        //true = heads, false = tails
+    public void chooseSide(boolean side) {
+        coinSide = side;
+        view.updateCoin(side);
+        view.updateSide(side);
+    }
+    public void visualChooseSide(boolean side, double scale) {
+        view.updateCoin(side, scale);
     }
 
     public void flipCoin() {
@@ -180,14 +232,44 @@ public class Controller implements ActionListener {
 
         request.add(betAmount);
 
-        Dataflow response = client.serverRequest(Instruct.FLIP_REQUEST, Instruct.FLIP_RESULT, request);
+        Thread requestThread = new Thread(new Runnable() {
+            public void run() {
+                response = client.serverRequest(Instruct.FLIP_REQUEST, Instruct.FLIP_RESULT, request);
+            }
+        });
+        requestThread.start();
+
+        //coin flip animation while waiting for server response
+        long baseTime = System.currentTimeMillis();
+        double scale = 1;
+        boolean flipSide = true;
+        while (requestThread.isAlive() || (System.currentTimeMillis() < baseTime + flipTime)) {
+            double x = ((double)(System.currentTimeMillis()-baseTime))/flipTime;
+            scale = 1 - 0.8*(x*x - x);
+            if (flipSide) {
+                flipSide = false;
+            } else {
+                flipSide = true;
+            }
+            visualChooseSide(flipSide, scale);
+            Util.sleep(0.05);
+        }
 
         if (response.getResult().isSuccessful()) {
             boolean outcome = (boolean)response.getNext();
-            money = (int)response.getNext();
+            if (outcome) {
+                visualChooseSide(coinSide, 1);
+            } else {
+                visualChooseSide(!coinSide, 1);
+            }
+            int newMoney = (int)response.getNext();
+            view.updateMoneyEarned(newMoney-money);
+            money = newMoney;
+            if (money < betAmount) {
+                setBetAmount(money);
+            }
             view.updateMoney(money);
         } else {
-            System.out.println("No success");
             view.setError(response.getResult().getMessage());
         }
     }

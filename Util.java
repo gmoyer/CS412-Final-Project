@@ -3,8 +3,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class Util {
+
+    private static final String validNumbers = "0123456789";
+    private static final String allowedCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_- ";
+
     //Client side. Pulled from https://stackoverflow.com/a/11009612
     public static String sha256(final String base) {
         try{
@@ -18,8 +23,8 @@ public class Util {
                 hexString.append(hex);
             }
             return hexString.toString();
-        } catch(Exception ex){
-           throw new RuntimeException(ex);
+        } catch(Exception e){
+           throw new RuntimeException(e);
         }
     }
 
@@ -35,5 +40,34 @@ public class Util {
     }
     public static boolean isCollection(Object obj) {
         return obj.getClass().isArray() || obj instanceof Collection;
-      }
+    }
+
+    public static void sleep(double seconds) {
+        try {
+            TimeUnit.MILLISECONDS.sleep((int)(seconds*1000));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public static boolean validNumber(String str) {
+        if (str.length() > 100)
+            return false;
+        for (int i = 0; i < str.length(); i++) {
+            if (validNumbers.indexOf(str.charAt(i)) == -1)
+                return false;
+        }
+        return true;
+    }
+
+    public static boolean validString(String str) {
+        if (str.length() > 100)
+            return false;
+        for (int i = 0; i < str.length(); i++) {
+            if (allowedCharacters.indexOf(str.charAt(i)) == -1)
+                return false;
+        }
+        return true;
+    }
 }

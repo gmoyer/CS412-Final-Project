@@ -7,8 +7,6 @@ public class AccountManager {
     private Entry entry; //active account entry
     private ArrayList<String> leaderboard;
 
-    private final String allowedCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-";
-
     public AccountManager() {
         database = Database.getInstance();
         entry = null;
@@ -33,7 +31,7 @@ public class AccountManager {
             return ReqResult.LONG_NAME;
         }
 
-        if (!(validString(name) && validString(username) && validString(password) && validString(confirmPassword)) )
+        if (!(Util.validString(name) && Util.validString(username) && Util.validString(password) && Util.validString(confirmPassword)) )
             return ReqResult.BAD_CHARACTERS;
         
 
@@ -68,16 +66,6 @@ public class AccountManager {
 
         entry.setField(Field.ACTIVE, 1);
         return ReqResult.SUCCESS;
-    }
-
-    public boolean validString(String str) {
-        if (str.length() > 100)
-            return false;
-        for (int i = 0; i < str.length(); i++) {
-            if (allowedCharacters.indexOf(str.charAt(i)) == -1)
-                return false;
-        }
-        return true;
     }
 
     public Entry getActiveEntry() {
