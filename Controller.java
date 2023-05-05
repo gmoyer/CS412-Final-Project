@@ -243,7 +243,7 @@ public class Controller implements ActionListener, KeyListener {
         long baseTime = System.currentTimeMillis();
         double scale = 1;
         boolean flipSide = true;
-        while (requestThread.isAlive() || (System.currentTimeMillis() < baseTime + flipTime)) {
+        while ((System.currentTimeMillis() < baseTime + flipTime)) {
             double x = ((double)(System.currentTimeMillis()-baseTime))/flipTime;
             scale = 1 - 0.8*(x*x - x);
             if (flipSide) {
@@ -253,6 +253,12 @@ public class Controller implements ActionListener, KeyListener {
             }
             visualChooseSide(flipSide, scale);
             Util.sleep(0.05);
+        }
+
+        try {
+            requestThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
 
         if (response.getResult().isSuccessful()) {
